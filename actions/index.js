@@ -1,10 +1,30 @@
 import fetch from 'isomorphic-fetch'
 
+export const REQUEST_SYNC = 'REQUEST_SYNC'
+export const SYNC = 'REQUEST_SYNC'
 /*export const REQUEST_POSTS = 'REQUEST_POSTS'
 export const RECEIVE_POSTS = 'RECEIVE_POSTS'
 export const SELECT_REDDIT = 'SELECT_REDDIT'
 export const INVALIDATE_REDDIT = 'INVALIDATE_REDDIT'
 export const RECEIVE_DATABASE = 'RECEIVE_DATABASE'
+*/
+
+function syncRequest(nextSync, timeoutHandle) {
+  return {
+    type: REQUEST_SYNC,
+    nextSync,
+    timeoutHandle
+  }
+}
+
+function sync(getState) {
+  return {
+    type: SYNC,
+    revs: getState().revs,
+  }
+}
+
+/*
 
 export function selectReddit(reddit) {
   return {
@@ -83,3 +103,21 @@ export function fetchPostsIfNeeded(reddit) {
   }
 }
 */
+
+export function requestSync(timeout) {
+  return (dispatch, getState) => {
+    const nextSync = Date.now() + timeout * 1000
+    const state = getState()
+
+    if (!state.syncing) {
+      if (state.timeout !== undefined) {
+        clearTimeout(state.timeout)
+      }
+      dispatch(syncRequest(nextSync, setTimeout((dispatch, getState) => {
+        dispatch(sync(getState))
+      }, timeout * 1000, dispatch, getState)))
+    } else {
+      dispatch(syncRequest(nextSync))
+    }
+  }
+}
