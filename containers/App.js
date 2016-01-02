@@ -2,6 +2,7 @@ import _ from 'lodash'
 import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
 // import { selectReddit, fetchPostsIfNeeded, invalidateReddit, openDatabase } from '../actions'
+import { requestSync } from '../actions'
 import ItemList from '../components/ItemList'
 import TagList from '../components/TagList'
 
@@ -16,6 +17,8 @@ class App extends Component {
     //const { dispatch, selectedReddit } = this.props
     //dispatch(fetchPostsIfNeeded(selectedReddit))
     //dispatch(openDatabase())
+    const { dispatch } = this.props
+    dispatch(requestSync(1))
   }
 
   componentWillReceiveProps(nextProps) {
@@ -39,10 +42,10 @@ class App extends Component {
   }
 
   render() {
-    const { items, tags } = this.props
-    console.log(this.props)
+    const { items, tags, sync } = this.props
     return (
       <div>
+        {sync.syncing ? 'syncing...' : 'idle'}
         <TagList tags={tags} />
         <ItemList items={items} />
       </div>
@@ -80,13 +83,14 @@ function computeTagList(tagOrder, items) {
 }
 
 function mapStateToProps(state, props) {
-  const { ui, tagOrder, items } = state
+  const { ui, tagOrder, items, sync } = state
   const selectedTag = props.params.name || 'inbox'
 
   return {
     ui: {...ui, selectedTag},
     tags: computeTagList(tagOrder, items),
-    items: filterItems(selectedTag, items)
+    items: filterItems(selectedTag, items),
+    sync
   }
 }
 

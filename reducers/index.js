@@ -1,7 +1,7 @@
 import { combineReducers } from 'redux'
 import { routeReducer } from 'redux-simple-router'
 
-import { REQUEST_SYNC, SYNC } from '../actions'
+import { SET_SYNC, SYNC_START, SYNC_END} from '../actions'
 /*
 import {
   SELECT_REDDIT, INVALIDATE_REDDIT,
@@ -87,38 +87,27 @@ function items(state = [
 
 function sync(state = {
   timeout: undefined,
-  nextSync: 0,
+  nextSync: undefined,
   syncing: false
 }, action) {
   switch (action.type) {
-    case REQUEST_SYNC:
+    case SET_SYNC:
       return Object.assign({}, state, {
         timeout: action.timeoutHandle,
         nextSync: action.nextSync
       })
-    case SYNC:
+    case SYNC_START:
       return Object.assign({}, state, {
         timeout: undefined,
         nextSync: undefined,
         syncing: true
       })
+    case SYNC_END:
+      return Object.assign({}, state, {
+        syncing: false
+      })
     default:
       return state
-
-/*      const nextSync = Date.now() + action.timeout * 1000
-      if (!state.syncing) {
-        if (state.timeout !== undefined) {
-          clearTimeout(state.timeout)
-        }
-        const newState = {
-          nextSync,
-          timeout: setTimeout(..., timeout * 1000)
-        }
-      } else {
-        newState = {nextSync}
-      }
-      return Object.assign({}, state, newState)
-      */
   }
 }
 
@@ -126,6 +115,7 @@ const rootReducer = combineReducers({
   ui,
   tagOrder,
   items,
+  sync,
   routing: routeReducer
 })
 
