@@ -112,13 +112,17 @@ export function fetchPostsIfNeeded(reddit) {
 
 function getDatabase() {
   return new Promise((resolve, reject) => {
-    const request = indexedDB.open('DB', 2)
+    const request = indexedDB.open('DB', 7)
     request.onsuccess = e => {
       resolve(e.target.result)
     }
     request.onupgradeneeded = e => {
       const db = e.target.result
-      db.createObjectStore('commands', {keyPath: 'key'})
+      if (e.oldVersion > 0) {
+        db.deleteObjectStore('commands')
+      }
+      const store = db.createObjectStore('commands', {keyPath: 'key'})
+      store.createIndex('time', 'time')
       resolve(db)
     }
   })
@@ -201,9 +205,10 @@ function processRevs(localRevs, remoteRevs) {
 
   return getDatabase()
     .then(db => Promise.all(revs.map(key => packCommand(loadCommand(db, key)))))
-    .then(commands => fetch('http://www.mocky.io/v2/56846f70270000903101dab9', {
+    .then(commands => fetch('/push', {
       method: 'POST',
-      body: commands
+      headers: new Headers({'X-GTD-Token': '0'}),
+      body: JSON.stringify({cmds: commands})
     }))
     .then(response => true)
 }
@@ -227,7 +232,7 @@ function sync(localRevs) {
         processRevs(localRevs, json.revs),
         processRemoteCommands(dispatch, json.cmds)]))
       .then(() => dispatch(syncEnd()))
-      .catch(() => console.log('pull problem'))
+      .catch(e => console.log(e))
       /* check if we need to do another sync */
   }
 }
