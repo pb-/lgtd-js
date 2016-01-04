@@ -111,11 +111,16 @@ function sync(state = {
   }
 }
 
+function revs(state = {}, action) {
+  return state
+}
+
 const rootReducer = combineReducers({
   ui,
   tagOrder,
   items,
   sync,
+  revs,
   routing: routeReducer
 })
 

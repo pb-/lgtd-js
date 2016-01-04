@@ -1,0 +1,5 @@
+root: false
+proxy:
+  '/': 'http://localhost:3000'
+  '/pull': 'http://localhost:4711'
+  '/push': 'http://localhost:4711'

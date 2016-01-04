@@ -217,12 +217,17 @@ function processRemoteCommands(dispatch, commands) {
 function sync(localRevs) {
   return dispatch => {
     dispatch(syncStart())
-    return fetch('/api/pull')
+    return fetch('/pull', {
+        method: 'POST',
+        headers: new Headers({'X-GTD-Token': '0'}),
+        body: JSON.stringify({revs: localRevs})
+      })
       .then(response => response.json())
       .then(json => Promise.all([
         processRevs(localRevs, json.revs),
         processRemoteCommands(dispatch, json.cmds)]))
       .then(() => dispatch(syncEnd()))
+      .catch(() => console.log('pull problem'))
       /* check if we need to do another sync */
   }
 }
