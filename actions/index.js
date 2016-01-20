@@ -1,8 +1,10 @@
 import fetch from 'isomorphic-fetch'
+import Immutable from 'immutable'
 
 export const SET_SYNC = 'SET_SYNC'
 export const SYNC_START = 'SYNC_START'
 export const SYNC_END = 'SYNC_END'
+export const EVAL_CMD = 'EVAL_CMD'
 /*export const REQUEST_POSTS = 'REQUEST_POSTS'
 export const RECEIVE_POSTS = 'RECEIVE_POSTS'
 export const SELECT_REDDIT = 'SELECT_REDDIT'
@@ -27,6 +29,13 @@ function syncStart() {
 function syncEnd() {
   return {
     type: SYNC_END
+  }
+}
+
+function evalCommand(command) {
+  return {
+    type: EVAL_CMD,
+    cmd: command
   }
 }
 
@@ -176,16 +185,15 @@ function loadCommand(db, key) {
 function executeCommands(dispatch, cmds) {
   cmds.sort((a, b) => a.time - b.time)
   for (const cmd of cmds) {
-    console.log(cmd)
-    //dispatch(actionFromCommand(cmd))
+    dispatch(evalCommand(cmd))
   }
 }
 
 function missingRemoteRevs(local, remote) {
   let revs = []
-  for (appID in local) {
-    localRev = local[appID]
-    remoteRev = remote[appID] || 0
+  for (const appID in local) {
+    const localRev = local[appID]
+    const remoteRev = remote[appID] || 0
 
     for (let r = remoteRev + 1; r <= localRev; r++) {
       revs.push([appID, r])
@@ -229,7 +237,7 @@ function sync(localRevs) {
       })
       .then(response => response.json())
       .then(json => Promise.all([
-        processRevs(localRevs, json.revs),
+        processRevs(localRevs, Immutable.Map(json.revs)),
         processRemoteCommands(dispatch, json.cmds)]))
       .then(() => dispatch(syncEnd()))
       .catch(e => console.log(e))

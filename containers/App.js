@@ -10,7 +10,7 @@ class App extends Component {
   constructor(props) {
     super(props)
     //this.handleChange = this.handleChange.bind(this)
-    //this.handleRefreshClick = this.handleRefreshClick.bind(this)
+    this.handleSyncClick = this.handleSyncClick.bind(this)
   }
 
   componentDidMount() {
@@ -41,11 +41,20 @@ class App extends Component {
     */
   }
 
+  handleSyncClick(e) {
+    e.preventDefault()
+
+    const { dispatch } = this.props
+    dispatch(requestSync(1))
+  }
+
   render() {
     const { items, tags, sync } = this.props
     return (
       <div>
-        {sync.syncing ? 'syncing...' : 'idle'}
+        <a href="" onClick={this.handleSyncClick}>
+          sync now
+        </a> {sync.syncing ? 'syncing...' : 'idle'}
         <TagList tags={tags} />
         <ItemList items={items} />
       </div>

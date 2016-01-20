@@ -1,7 +1,8 @@
 import { combineReducers } from 'redux'
 import { routeReducer } from 'redux-simple-router'
+import Immutable from 'immutable'
 
-import { SET_SYNC, SYNC_START, SYNC_END} from '../actions'
+import { SET_SYNC, SYNC_START, SYNC_END, EVAL_CMD} from '../actions'
 /*
 import {
   SELECT_REDDIT, INVALIDATE_REDDIT,
@@ -111,8 +112,13 @@ function sync(state = {
   }
 }
 
-function revs(state = {}, action) {
-  return state
+function revs(state = Immutable.Map(), action) {
+  switch (action.type) {
+    case EVAL_CMD:
+      return state.set(action.cmd.key[0], action.cmd.key[1])
+    default:
+      return state
+  }
 }
 
 const rootReducer = combineReducers({
