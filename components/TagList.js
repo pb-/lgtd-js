@@ -9,10 +9,10 @@ export default class TagList extends Component {
   }
 
   renderTag(tag) {
-    const { name, itemCount } = tag
+    const { name, count } = tag
     return (
       <li key={name}>
-        <Link to={`/tag/${name}`}>{name}{this.renderCount(itemCount)}</Link>
+        <Link to={`/tag/${name}`}>{name}{this.renderCount(count)}</Link>
       </li>
     )
   }

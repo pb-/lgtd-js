@@ -2,7 +2,7 @@ import _ from 'lodash'
 import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
 // import { selectReddit, fetchPostsIfNeeded, invalidateReddit, openDatabase } from '../actions'
-import { requestSync } from '../actions'
+import { socketRecv, socketReady } from '../actions'
 import ItemList from '../components/ItemList'
 import TagList from '../components/TagList'
 
@@ -18,7 +18,15 @@ class App extends Component {
     //dispatch(fetchPostsIfNeeded(selectedReddit))
     //dispatch(openDatabase())
     const { dispatch } = this.props
-    dispatch(requestSync(1))
+    //dispatch(requestSync(1))
+
+    let socket = new WebSocket('ws://127.0.0.1:9001/gtd')
+    socket.onopen = () => {
+      dispatch(socketReady(socket))
+    }
+    socket.onmessage = (event) => {
+      dispatch(socketRecv(socket, JSON.parse(event.data)))
+    }
   }
 
   componentWillReceiveProps(nextProps) {
@@ -49,12 +57,9 @@ class App extends Component {
   }
 
   render() {
-    const { items, tags, sync } = this.props
+    const { tags, items } = this.props
     return (
       <div>
-        <a href="" onClick={this.handleSyncClick}>
-          sync now
-        </a> {sync.syncing ? 'syncing...' : 'idle'}
         <TagList tags={tags} />
         <ItemList items={items} />
       </div>
@@ -63,43 +68,16 @@ class App extends Component {
 }
 
 App.propTypes = {
-//  selectedReddit: PropTypes.string.isRequired,
+  tags: PropTypes.array.isRequired,
   items: PropTypes.array.isRequired,
-  //isFetching: PropTypes.bool.isRequired,
-  //lastUpdated: PropTypes.number,
-  //dispatch: PropTypes.func.isRequired
-}
-
-function actualTag(tag) {
-  switch (tag) {
-    case '':
-      return 'inbox'
-    default:
-      return tag
-  }
-}
-
-function filterItems(tag, items) {
-  return items.filter(item => actualTag(item.tag) === tag)
-}
-
-function computeTagList(tagOrder, items) {
-  const grouped = _.groupBy(items, item => actualTag(item.tag))
-  return tagOrder.map(name => ({
-    name: name,
-    itemCount: name in grouped ? grouped[name].length : 0
-  }))
 }
 
 function mapStateToProps(state, props) {
-  const { ui, tagOrder, items, sync } = state
-  const selectedTag = props.params.name || 'inbox'
+  const { tags, items } = state
 
   return {
-    ui: {...ui, selectedTag},
-    tags: computeTagList(tagOrder, items),
-    items: filterItems(selectedTag, items),
-    sync
+    tags,
+    items
   }
 }
 

@@ -1,8 +1,7 @@
 import { combineReducers } from 'redux'
 import { routeReducer } from 'redux-simple-router'
-import Immutable from 'immutable'
 
-import { SET_SYNC, SYNC_START, SYNC_END, EVAL_CMD} from '../actions'
+import { SET_SYNC, SYNC_START, SYNC_END, EVAL_CMD, SOCKET_RECV, SOCKET_OBJECT } from '../actions'
 /*
 import {
   SELECT_REDDIT, INVALIDATE_REDDIT,
@@ -69,21 +68,46 @@ function db(state = null, action) {
 */
 
 function ui(state = {
-  selectedTag: 'inbox'
+  activeTag: 'inbox'
 }, action) {
-  return state
+  if (action.type == SOCKET_RECV) {
+    return Object.assign({}, state, {
+      activeTag: action.state.tags[action.state.active_tag].name
+    })
+  } else {
+    return state
+  }
 }
 
-function tagOrder(state = ['inbox', 'todo', 'empty'], action) {
-  return state
+function socket(state = null, action) {
+  if (action.type == SOCKET_OBJECT) {
+    return action.socket
+  } else {
+    return state
+  }
+}
+
+function tags(state = [
+    {name: 'inbox', count: 3},
+    {name: 'todo', count: 0},
+  ], action) {
+  if (action.type == SOCKET_RECV) {
+    return action.state.tags
+  } else {
+    return state
+  }
 }
 
 function items(state = [
-  {id: '000', title: 'first item', tag: ''},
-  {id: '001', title: 'second item', tag: ''},
-  {id: '002', title: 'third item', tag: 'todo'},
-], action) {
-  return state
+    {id: '000', title: 'first item'},
+    {id: '001', title: 'second item'},
+    {id: '002', title: 'third item'},
+  ], action) {
+  if (action.type == SOCKET_RECV) {
+    return action.state.items
+  } else {
+    return state
+  }
 }
 
 function sync(state = {
@@ -123,11 +147,10 @@ function revs(state = Immutable.Map(), action) {
 
 const rootReducer = combineReducers({
   ui,
-  tagOrder,
+  socket,
+  tags,
   items,
-  sync,
-  revs,
-  routing: routeReducer
+  routing: routeReducer,
 })
 
 export default rootReducer

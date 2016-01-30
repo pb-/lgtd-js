@@ -1,16 +1,53 @@
 import fetch from 'isomorphic-fetch'
-import Immutable from 'immutable'
 
 export const SET_SYNC = 'SET_SYNC'
 export const SYNC_START = 'SYNC_START'
 export const SYNC_END = 'SYNC_END'
 export const EVAL_CMD = 'EVAL_CMD'
+export const SOCKET_OBJECT = 'SOCKET_OBJECT'
+export const SOCKET_RECV = 'SOCKET_RECV'
 /*export const REQUEST_POSTS = 'REQUEST_POSTS'
 export const RECEIVE_POSTS = 'RECEIVE_POSTS'
 export const SELECT_REDDIT = 'SELECT_REDDIT'
 export const INVALIDATE_REDDIT = 'INVALIDATE_REDDIT'
 export const RECEIVE_DATABASE = 'RECEIVE_DATABASE'
 */
+
+function socketRecvState(state) {
+  return {
+    type: SOCKET_RECV,
+    state,
+  }
+}
+
+function socketObj(socket) {
+  return {
+    type: SOCKET_OBJECT,
+    socket
+  }
+}
+
+function socketRequestState(tag) {
+  return JSON.stringify({msg: 'request_state', tag})
+}
+
+export function socketReady(socket) {
+  return (dispatch, getState) => {
+    dispatch(socketObj(socket))
+    socket.send(socketRequestState(getState().ui.activeTag))
+  }
+}
+
+export function socketRecv(socket, data) {
+  return (dispatch, getState) => {
+    switch (data.msg) {
+      case 'state':
+        return dispatch(socketRecvState(data.state))
+      case 'new_state':
+        return socket.send(socketRequestState(getState().ui.activeTag))
+    }
+  }
+}
 
 function setSync(nextSync, timeoutHandle) {
   return {
