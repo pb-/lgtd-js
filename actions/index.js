@@ -49,6 +49,12 @@ export function socketRecv(socket, data) {
   }
 }
 
+export function changeTag(tag) {
+  return (dispatch, getState) => {
+    getState().socket.send(socketRequestState(tag))
+  }
+}
+
 function setSync(nextSync, timeoutHandle) {
   return {
     type: SET_SYNC,

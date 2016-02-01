@@ -12,7 +12,9 @@ export default class TagList extends Component {
     const { name, count } = tag
     return (
       <li key={name}>
-        <Link to={`/tag/${name}`}>{name}{this.renderCount(count)}</Link>
+        <a href="#" onClick={e => this.props.onSwitchTag(e, name)}>
+          {name}{this.renderCount(count)}
+        </a>
       </li>
     )
   }
@@ -27,6 +29,7 @@ export default class TagList extends Component {
 }
 
 TagList.propTypes = {
-  tags: PropTypes.array.isRequired
+  tags: PropTypes.array.isRequired,
+  onSwitchTag: PropTypes.func.isRequired,
 }
 

@@ -2,7 +2,8 @@ import _ from 'lodash'
 import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
 // import { selectReddit, fetchPostsIfNeeded, invalidateReddit, openDatabase } from '../actions'
-import { socketRecv, socketReady } from '../actions'
+import { socketRecv, socketReady, changeTag } from '../actions'
+import { pushPath } from 'redux-simple-router'
 import ItemList from '../components/ItemList'
 import TagList from '../components/TagList'
 
@@ -11,6 +12,7 @@ class App extends Component {
     super(props)
     //this.handleChange = this.handleChange.bind(this)
     this.handleSyncClick = this.handleSyncClick.bind(this)
+    this.handleTagSwitch = this.handleTagSwitch.bind(this)
   }
 
   componentDidMount() {
@@ -56,11 +58,19 @@ class App extends Component {
     dispatch(requestSync(1))
   }
 
+  handleTagSwitch(e, tag) {
+    e.preventDefault()
+
+    const { dispatch } = this.props
+    dispatch(pushPath(`/tag/${tag}`))
+    dispatch(changeTag(tag))
+  }
+
   render() {
     const { tags, items } = this.props
     return (
       <div>
-        <TagList tags={tags} />
+        <TagList tags={tags} onSwitchTag={this.handleTagSwitch} />
         <ItemList items={items} />
       </div>
     )
@@ -73,9 +83,10 @@ App.propTypes = {
 }
 
 function mapStateToProps(state, props) {
-  const { tags, items } = state
+  const { socket, tags, items } = state
 
   return {
+    socket,
     tags,
     items
   }
