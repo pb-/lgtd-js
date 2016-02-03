@@ -31,6 +31,18 @@ function socketRequestState(tag) {
   return JSON.stringify({msg: 'request_state', tag})
 }
 
+function socketPushCommands(commands) {
+  return JSON.stringify({msg: 'push_commands', cmds: commands})
+}
+
+function cmdSetTitle(itemId, title) {
+  return 't ' + itemId + ' ' + title
+}
+
+function cmdSetTag(itemId, tag) {
+  return 'T ' + itemId + ' ' + tag
+}
+
 export function socketReady(socket) {
   return (dispatch, getState) => {
     dispatch(socketObj(socket))
@@ -52,6 +64,18 @@ export function socketRecv(socket, data) {
 export function changeTag(tag) {
   return (dispatch, getState) => {
     getState().socket.send(socketRequestState(tag))
+  }
+}
+
+export function commandSetTitle(itemId, title, tag = undefined) {
+  return (dispatch, getState) => {
+    let cmds = [cmdSetTitle(itemId, title)]
+
+    if (tag !== undefined) {
+      cmds.push(cmdSetTag(itemId, tag))
+    }
+
+    getState().socket.send(socketPushCommands(cmds))
   }
 }
 
