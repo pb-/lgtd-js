@@ -110,7 +110,7 @@ class App extends Component {
           <TagList tags={tags} onSwitchTag={this.handleTagSwitch} activeTag={this.props.ui.activeTag} />
         </div>
         <div id="content">
-          <input id="add" placeholder="Add stuff..." ref="add" type="text" onKeyDown={this.handleAddStuff} />
+          <input id="add" placeholder="Add stuff&hellip;" ref="add" type="text" onKeyDown={this.handleAddStuff} />
           <ItemList items={items} onDelete={this.handleDeleteItem} />
         </div>
       </div>
