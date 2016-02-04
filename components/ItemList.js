@@ -3,9 +3,14 @@ import React, { PropTypes, Component } from 'react'
 export default class ItemList extends Component {
   render() {
     return (
-      <ul>
+      <ul id="items">
         {this.props.items.map(item =>
-          <li key={item.id}>{item.title}</li>
+          <li key={item.id}>
+            {item.title}
+            <a className="btn" onClick={e => this.props.onDelete(e, item.id)}>
+              remove
+            </a>
+          </li>
         )}
       </ul>
     )
@@ -13,5 +18,6 @@ export default class ItemList extends Component {
 }
 
 ItemList.propTypes = {
-  items: PropTypes.array.isRequired
+  items: PropTypes.array.isRequired,
+  onDelete: PropTypes.func.isRequired
 }

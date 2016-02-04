@@ -3,7 +3,7 @@ import React, { Component, PropTypes } from 'react'
 import ReactDOM from 'react-dom'
 import { connect } from 'react-redux'
 // import { selectReddit, fetchPostsIfNeeded, invalidateReddit, openDatabase } from '../actions'
-import { socketRecv, socketReady, changeTag, commandSetTitle } from '../actions'
+import { socketRecv, socketReady, changeTag, commandSetTitle, commandDeleteItem } from '../actions'
 import { pushPath } from 'redux-simple-router'
 import { generateItemId } from '../util'
 import ItemList from '../components/ItemList'
@@ -16,6 +16,7 @@ class App extends Component {
     this.handleSyncClick = this.handleSyncClick.bind(this)
     this.handleTagSwitch = this.handleTagSwitch.bind(this)
     this.handleAddStuff = this.handleAddStuff.bind(this)
+    this.handleDeleteItem = this.handleDeleteItem.bind(this)
   }
 
   componentDidMount() {
@@ -92,14 +93,25 @@ class App extends Component {
     }
   }
 
+  handleDeleteItem(e, item_id) {
+    const { dispatch } = this.props
+
+    e.preventDefault()
+    dispatch(commandDeleteItem(item_id))
+    this.focusAddStuff()
+  }
+
   render() {
     const { tags, items } = this.props
     return (
       <div>
-        <TagList tags={tags} onSwitchTag={this.handleTagSwitch} />
-        <div>
-          <input placeholder="Add stuff..." ref="add" type="text" onKeyDown={this.handleAddStuff} />
-          <ItemList items={items} />
+        <div id="menu">
+          <p id="thead">lgtd-jsclient</p>
+          <TagList tags={tags} onSwitchTag={this.handleTagSwitch} activeTag={this.props.ui.activeTag} />
+        </div>
+        <div id="content">
+          <input id="add" placeholder="Add stuff..." ref="add" type="text" onKeyDown={this.handleAddStuff} />
+          <ItemList items={items} onDelete={this.handleDeleteItem} />
         </div>
       </div>
     )

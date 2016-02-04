@@ -43,6 +43,10 @@ function cmdSetTag(itemId, tag) {
   return 'T ' + itemId + ' ' + tag
 }
 
+function cmdDeleteItem(itemId) {
+  return 'd ' + itemId
+}
+
 export function socketReady(socket) {
   return (dispatch, getState) => {
     dispatch(socketObj(socket))
@@ -76,6 +80,12 @@ export function commandSetTitle(itemId, title, tag = undefined) {
     }
 
     getState().socket.send(socketPushCommands(cmds))
+  }
+}
+
+export function commandDeleteItem(itemId) {
+  return (dispatch, getState) => {
+    getState().socket.send(socketPushCommands([cmdDeleteItem(itemId)]))
   }
 }
 
