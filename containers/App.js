@@ -17,6 +17,7 @@ class App extends Component {
     this.handleTagSwitch = this.handleTagSwitch.bind(this)
     this.handleAddStuff = this.handleAddStuff.bind(this)
     this.handleDeleteItem = this.handleDeleteItem.bind(this)
+    this.handleChangeTitle = this.handleChangeTitle.bind(this)
   }
 
   componentDidMount() {
@@ -80,7 +81,7 @@ class App extends Component {
   handleAddStuff(e) {
     const { dispatch, ui } = this.props
 
-    if (e.keyCode == 13) {
+    if (e.keyCode === 13) {
       let tag
       if (ui.activeTag !== 'inbox' && ui.activeTag !== 'tickler') {
         tag = ui.activeTag
@@ -101,6 +102,12 @@ class App extends Component {
     this.focusAddStuff()
   }
 
+  handleChangeTitle(itemId, title) {
+    const { dispatch } = this.props
+
+    dispatch(commandSetTitle(itemId, title))
+  }
+
   render() {
     const { tags, items } = this.props
     return (
@@ -111,7 +118,7 @@ class App extends Component {
         </div>
         <div id="content">
           <input id="add" placeholder="Add stuff&hellip;" ref="add" type="text" onKeyDown={this.handleAddStuff} />
-          <ItemList items={items} onDelete={this.handleDeleteItem} />
+          <ItemList items={items} onDelete={this.handleDeleteItem} onChangeTitle={this.handleChangeTitle} />
         </div>
       </div>
     )
