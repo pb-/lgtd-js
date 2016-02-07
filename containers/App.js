@@ -2,7 +2,6 @@ import _ from 'lodash'
 import React, { Component, PropTypes } from 'react'
 import ReactDOM from 'react-dom'
 import { connect } from 'react-redux'
-// import { selectReddit, fetchPostsIfNeeded, invalidateReddit, openDatabase } from '../actions'
 import { socketRecv, socketReady, changeTag, commandSetTitle, commandDeleteItem, commandSetTag, commandUnsetTag, startDragItem, endDragItem } from '../actions'
 import { pushPath } from 'redux-simple-router'
 import { generateItemId } from '../util'
@@ -12,7 +11,6 @@ import TagList from '../components/TagList'
 class App extends Component {
   constructor(props) {
     super(props)
-    //this.handleChange = this.handleChange.bind(this)
     this.handleSyncClick = this.handleSyncClick.bind(this)
     this.handleTagSwitch = this.handleTagSwitch.bind(this)
     this.handleAddStuff = this.handleAddStuff.bind(this)
@@ -24,13 +22,7 @@ class App extends Component {
   }
 
   componentDidMount() {
-    //const { dispatch, selectedReddit } = this.props
-    //dispatch(fetchPostsIfNeeded(selectedReddit))
-    //dispatch(openDatabase())
     const { dispatch } = this.props
-    //dispatch(requestSync(1))
-
-    this.focusAddStuff()
 
     let socket = new WebSocket('ws://127.0.0.1:9001/gtd')
     socket.onopen = () => {
@@ -39,26 +31,8 @@ class App extends Component {
     socket.onmessage = (event) => {
       dispatch(socketRecv(socket, JSON.parse(event.data)))
     }
-  }
 
-  componentWillReceiveProps(nextProps) {
-    //if (nextProps.selectedReddit !== this.props.selectedReddit) {
-    //  const { dispatch, selectedReddit } = nextProps
-    //  dispatch(fetchPostsIfNeeded(selectedReddit))
-    //}
-  }
-
-  handleChange(nextReddit) {
-    //this.props.dispatch(selectReddit(nextReddit))
-  }
-
-  handleRefreshClick(e) {
-    /*e.preventDefault()
-
-    const { dispatch, selectedReddit } = this.props
-    dispatch(invalidateReddit(selectedReddit))
-    dispatch(fetchPostsIfNeeded(selectedReddit))
-    */
+    this.focusAddStuff()
   }
 
   focusAddStuff() {

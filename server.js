@@ -16,9 +16,6 @@ app.get("/", function(req, res) {
 app.get("/tag/*", function(req, res) {
   res.sendFile(__dirname + '/index.html')
 })
-app.get("/api/pull", function(req, res) {
-  res.sendFile(__dirname + '/pull.json')
-})
 
 app.listen(port, function(error) {
   if (error) {
