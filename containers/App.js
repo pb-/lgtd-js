@@ -51,12 +51,14 @@ class App extends Component {
     const { dispatch, ui } = this.props
 
     if (e.keyCode === 13) {
-      let tag
-      if (ui.activeTag !== 'inbox' && ui.activeTag !== 'tickler') {
-        tag = ui.activeTag
+      if (e.target.value.length > 0) {
+        let tag
+        if (ui.activeTag !== 'inbox' && ui.activeTag !== 'tickler') {
+          tag = ui.activeTag
+        }
+        dispatch(commandSetTitle(generateItemId(), e.target.value, tag))
+        e.target.value = ''
       }
-      dispatch(commandSetTitle(generateItemId(), e.target.value, tag))
-      e.target.value = ''
       return false
     } else {
       return true
