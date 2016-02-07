@@ -1,6 +1,4 @@
 import { combineReducers } from 'redux'
-import { routeReducer } from 'redux-simple-router'
-
 import { SOCKET_RECV, SOCKET_OBJECT, START_DRAG_ITEM, END_DRAG_ITEM } from '../actions'
 
 
@@ -62,7 +60,6 @@ const rootReducer = combineReducers({
   socket,
   tags,
   items,
-  routing: routeReducer,
 })
 
 export default rootReducer

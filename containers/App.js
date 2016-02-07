@@ -3,7 +3,6 @@ import React, { Component, PropTypes } from 'react'
 import ReactDOM from 'react-dom'
 import { connect } from 'react-redux'
 import { socketRecv, socketReady, changeTag, commandSetTitle, commandDeleteItem, commandSetTag, commandUnsetTag, startDragItem, endDragItem } from '../actions'
-import { pushPath } from 'redux-simple-router'
 import { generateItemId } from '../util'
 import ItemList from '../components/ItemList'
 import TagList from '../components/TagList'
@@ -42,7 +41,6 @@ class App extends Component {
     e.preventDefault()
 
     const { dispatch } = this.props
-    dispatch(pushPath(`/tag/${tag}`))
     dispatch(changeTag(tag))
     this.focusAddStuff()
   }
