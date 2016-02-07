@@ -11,7 +11,6 @@ import TagList from '../components/TagList'
 class App extends Component {
   constructor(props) {
     super(props)
-    this.handleSyncClick = this.handleSyncClick.bind(this)
     this.handleTagSwitch = this.handleTagSwitch.bind(this)
     this.handleAddStuff = this.handleAddStuff.bind(this)
     this.handleDeleteItem = this.handleDeleteItem.bind(this)
@@ -37,13 +36,6 @@ class App extends Component {
 
   focusAddStuff() {
     ReactDOM.findDOMNode(this.refs.add).focus();
-  }
-
-  handleSyncClick(e) {
-    e.preventDefault()
-
-    const { dispatch } = this.props
-    dispatch(requestSync(1))
   }
 
   handleTagSwitch(e, tag) {
