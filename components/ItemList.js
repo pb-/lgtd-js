@@ -8,6 +8,7 @@ export default class ItemList extends Component {
     this.onEditKeyDown = this.onEditKeyDown.bind(this)
     this.onCancelEdit = this.onCancelEdit.bind(this)
     this.onFocus = this.onFocus.bind(this)
+    this.onStartDrag= this.onStartDrag.bind(this)
   }
 
   onStartEdit(e, itemId) {
@@ -33,6 +34,11 @@ export default class ItemList extends Component {
     el.selectionStart = el.selectionEnd = el.value.length
   }
 
+  onStartDrag(e, item) {
+    e.dataTransfer.setData('text/plain', item.title)
+    this.props.onStartDrag(item.id)
+  }
+
   renderItem(item) {
     if (item.id === this.state.editItemId) {
       return (
@@ -49,7 +55,12 @@ export default class ItemList extends Component {
     } else {
       return (
         <li key={item.id}>
-          <span onClick={e => this.onStartEdit(e, item.id)}>{item.title}</span>
+          <span draggable
+                onClick={e => this.onStartEdit(e, item.id)}
+                onDragStart={e => this.onStartDrag(e, item)}
+                onDragEnd={e => this.props.onEndDrag()}>
+            {item.title}
+          </span>
           <a className="btn" onClick={e => this.props.onDelete(e, item.id)}>
             remove
           </a>
@@ -70,5 +81,7 @@ export default class ItemList extends Component {
 ItemList.propTypes = {
   items: PropTypes.array.isRequired,
   onDelete: PropTypes.func.isRequired,
-  onChangeTitle: PropTypes.func.isRequired
+  onChangeTitle: PropTypes.func.isRequired,
+  onStartDrag: PropTypes.func.isRequired,
+  onEndDrag: PropTypes.func.isRequired,
 }

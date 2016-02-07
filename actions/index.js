@@ -6,6 +6,8 @@ export const SYNC_END = 'SYNC_END'
 export const EVAL_CMD = 'EVAL_CMD'
 export const SOCKET_OBJECT = 'SOCKET_OBJECT'
 export const SOCKET_RECV = 'SOCKET_RECV'
+export const START_DRAG_ITEM = 'START_DRAG_ITEM'
+export const END_DRAG_ITEM = 'END_DRAG_ITEM'
 /*export const REQUEST_POSTS = 'REQUEST_POSTS'
 export const RECEIVE_POSTS = 'RECEIVE_POSTS'
 export const SELECT_REDDIT = 'SELECT_REDDIT'
@@ -47,6 +49,10 @@ function cmdDeleteItem(itemId) {
   return 'd ' + itemId
 }
 
+function cmdUnsetTag(itemId) {
+  return 'D ' + itemId
+}
+
 export function socketReady(socket) {
   return (dispatch, getState) => {
     dispatch(socketObj(socket))
@@ -86,6 +92,31 @@ export function commandSetTitle(itemId, title, tag = undefined) {
 export function commandDeleteItem(itemId) {
   return (dispatch, getState) => {
     getState().socket.send(socketPushCommands([cmdDeleteItem(itemId)]))
+  }
+}
+
+export function commandSetTag(itemId, tag) {
+  return (dispatch, getState) => {
+    getState().socket.send(socketPushCommands([cmdSetTag(itemId, tag)]))
+  }
+}
+
+export function commandUnsetTag(itemId) {
+  return (dispatch, getState) => {
+    getState().socket.send(socketPushCommands([cmdUnsetTag(itemId)]))
+  }
+}
+
+export function startDragItem(itemId) {
+  return {
+    type: START_DRAG_ITEM,
+    itemId
+  }
+}
+
+export function endDragItem() {
+  return {
+    type: END_DRAG_ITEM
   }
 }
 

@@ -3,7 +3,7 @@ import React, { Component, PropTypes } from 'react'
 import ReactDOM from 'react-dom'
 import { connect } from 'react-redux'
 // import { selectReddit, fetchPostsIfNeeded, invalidateReddit, openDatabase } from '../actions'
-import { socketRecv, socketReady, changeTag, commandSetTitle, commandDeleteItem } from '../actions'
+import { socketRecv, socketReady, changeTag, commandSetTitle, commandDeleteItem, commandSetTag, commandUnsetTag, startDragItem, endDragItem } from '../actions'
 import { pushPath } from 'redux-simple-router'
 import { generateItemId } from '../util'
 import ItemList from '../components/ItemList'
@@ -18,6 +18,9 @@ class App extends Component {
     this.handleAddStuff = this.handleAddStuff.bind(this)
     this.handleDeleteItem = this.handleDeleteItem.bind(this)
     this.handleChangeTitle = this.handleChangeTitle.bind(this)
+    this.handleStartDragItem = this.handleStartDragItem.bind(this)
+    this.handleEndDragItem = this.handleEndDragItem.bind(this)
+    this.handleDropItem = this.handleDropItem.bind(this)
   }
 
   componentDidMount() {
@@ -108,17 +111,44 @@ class App extends Component {
     dispatch(commandSetTitle(itemId, title))
   }
 
+  handleStartDragItem(itemId) {
+    this.props.dispatch(startDragItem(itemId))
+  }
+
+  handleEndDragItem() {
+    this.props.dispatch(endDragItem())
+    this.focusAddStuff()
+  }
+
+  handleDropItem(tag) {
+    if (tag !== this.props.ui.activeTag && tag !== 'tickler') {
+      if (tag === 'inbox') {
+        this.props.dispatch(commandUnsetTag(this.props.ui.dragItemId))
+      } else {
+        this.props.dispatch(commandSetTag(this.props.ui.dragItemId, tag))
+      }
+    }
+  }
+
   render() {
     const { tags, items } = this.props
     return (
       <div>
         <div id="menu">
           <p id="thead">lgtd-jsclient</p>
-          <TagList tags={tags} onSwitchTag={this.handleTagSwitch} activeTag={this.props.ui.activeTag} />
+          <TagList
+              tags={tags}
+              onSwitchTag={this.handleTagSwitch}
+              onDropItem={this.handleDropItem}
+              activeTag={this.props.ui.activeTag} />
         </div>
         <div id="content">
           <input id="add" placeholder="Add stuff&hellip;" ref="add" type="text" onKeyDown={this.handleAddStuff} />
-          <ItemList items={items} onDelete={this.handleDeleteItem} onChangeTitle={this.handleChangeTitle} />
+          <ItemList items={items}
+                    onDelete={this.handleDeleteItem}
+                    onChangeTitle={this.handleChangeTitle}
+                    onStartDrag={this.handleStartDragItem}
+                    onEndDrag={this.handleEndDragItem} />
         </div>
       </div>
     )

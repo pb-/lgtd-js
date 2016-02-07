@@ -1,7 +1,7 @@
 import { combineReducers } from 'redux'
 import { routeReducer } from 'redux-simple-router'
 
-import { SET_SYNC, SYNC_START, SYNC_END, EVAL_CMD, SOCKET_RECV, SOCKET_OBJECT } from '../actions'
+import { SET_SYNC, SYNC_START, SYNC_END, EVAL_CMD, SOCKET_RECV, SOCKET_OBJECT, START_DRAG_ITEM, END_DRAG_ITEM } from '../actions'
 /*
 import {
   SELECT_REDDIT, INVALIDATE_REDDIT,
@@ -68,14 +68,24 @@ function db(state = null, action) {
 */
 
 function ui(state = {
-  activeTag: 'inbox'
+  activeTag: 'inbox',
+  dragItemId: null,
 }, action) {
-  if (action.type == SOCKET_RECV) {
-    return Object.assign({}, state, {
-      activeTag: action.state.tags[action.state.active_tag].name
-    })
-  } else {
-    return state
+  switch (action.type) {
+    case START_DRAG_ITEM:
+      return Object.assign({}, state, {
+        dragItemId: action.itemId
+      })
+    case END_DRAG_ITEM:
+      return Object.assign({}, state, {
+        dragItemId: null
+      })
+    case SOCKET_RECV:
+      return Object.assign({}, state, {
+        activeTag: action.state.tags[action.state.active_tag].name
+      })
+    default:
+      return state
   }
 }
 
