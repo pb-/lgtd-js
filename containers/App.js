@@ -2,7 +2,7 @@ import _ from 'lodash'
 import React, { Component, PropTypes } from 'react'
 import ReactDOM from 'react-dom'
 import { connect } from 'react-redux'
-import { socketRecv, socketReady, changeTag, commandSetTitle, commandDeleteItem, commandSetTag, commandUnsetTag, startDragItem, endDragItem } from '../actions'
+import { socketRecv, socketReady, changeTag, commandSetTitle, commandDeleteItem, commandSetTag, commandUnsetTag, startDragItem, endDragItem, requestAddTag } from '../actions'
 import { generateItemId } from '../util'
 import ItemList from '../components/ItemList'
 import TagList from '../components/TagList'
@@ -76,7 +76,10 @@ class App extends Component {
 
   handleEndDragItem() {
     this.props.dispatch(endDragItem())
-    this.focusAddStuff()
+
+    if (this.props.ui.addTagItemId === null) {
+      this.focusAddStuff()
+    }
   }
 
   handleDropItem(tag) {
@@ -89,6 +92,10 @@ class App extends Component {
     }
   }
 
+  handleRequestAddTag() {
+    this.props.dispatch(requestAddTag(this.props.ui.dragItemId))
+  }
+
   render() {
     const { tags, items } = this.props
     return (
@@ -97,9 +104,12 @@ class App extends Component {
           <p id="thead">lgtd-jsclient</p>
           <TagList
               tags={tags}
+              activeTag={this.props.ui.activeTag}
+              showAddTag={this.props.ui.dragItemId !== null}
+              showAddTagInput={this.props.ui.addTagItemId !== null}
               onSwitchTag={this.handleTagSwitch.bind(this)}
               onDropItem={this.handleDropItem.bind(this)}
-              activeTag={this.props.ui.activeTag} />
+              onRequestAdd={this.handleRequestAddTag.bind(this)} />
         </div>
         <div id="content">
           <input id="add" placeholder="Add stuff&hellip;" ref="add" type="text" onKeyDown={this.handleAddStuff.bind(this)} />
