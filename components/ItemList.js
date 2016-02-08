@@ -16,6 +16,8 @@ export default class ItemList extends Component {
   }
 
   onEditKeyDown(e) {
+    e.stopPropagation()
+
     if (e.keyCode === 13) {
       this.props.onChangeTitle(this.state.editItemId, e.target.value)
       this.onCancelEdit()

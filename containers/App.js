@@ -24,6 +24,7 @@ class App extends Component {
     }
 
     this.focusAddStuff()
+    window.addEventListener('keydown', (e) => this.focusAddStuff())
   }
 
   focusAddStuff() {
@@ -40,6 +41,7 @@ class App extends Component {
 
   handleAddStuff(e) {
     const { dispatch, ui } = this.props
+    e.stopPropagation()
 
     if (e.keyCode === 13) {
       if (e.target.value.length > 0) {
