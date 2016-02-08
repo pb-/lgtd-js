@@ -10,13 +10,6 @@ import TagList from '../components/TagList'
 class App extends Component {
   constructor(props) {
     super(props)
-    this.handleTagSwitch = this.handleTagSwitch.bind(this)
-    this.handleAddStuff = this.handleAddStuff.bind(this)
-    this.handleDeleteItem = this.handleDeleteItem.bind(this)
-    this.handleChangeTitle = this.handleChangeTitle.bind(this)
-    this.handleStartDragItem = this.handleStartDragItem.bind(this)
-    this.handleEndDragItem = this.handleEndDragItem.bind(this)
-    this.handleDropItem = this.handleDropItem.bind(this)
   }
 
   componentDidMount() {
@@ -104,17 +97,17 @@ class App extends Component {
           <p id="thead">lgtd-jsclient</p>
           <TagList
               tags={tags}
-              onSwitchTag={this.handleTagSwitch}
-              onDropItem={this.handleDropItem}
+              onSwitchTag={this.handleTagSwitch.bind(this)}
+              onDropItem={this.handleDropItem.bind(this)}
               activeTag={this.props.ui.activeTag} />
         </div>
         <div id="content">
-          <input id="add" placeholder="Add stuff&hellip;" ref="add" type="text" onKeyDown={this.handleAddStuff} />
+          <input id="add" placeholder="Add stuff&hellip;" ref="add" type="text" onKeyDown={this.handleAddStuff.bind(this)} />
           <ItemList items={items}
-                    onDelete={this.handleDeleteItem}
-                    onChangeTitle={this.handleChangeTitle}
-                    onStartDrag={this.handleStartDragItem}
-                    onEndDrag={this.handleEndDragItem} />
+                    onDelete={this.handleDeleteItem.bind(this)}
+                    onChangeTitle={this.handleChangeTitle.bind(this)}
+                    onStartDrag={this.handleStartDragItem.bind(this)}
+                    onEndDrag={this.handleEndDragItem.bind(this)} />
         </div>
       </div>
     )
