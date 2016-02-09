@@ -29,6 +29,21 @@ export default class TagList extends Component {
     this.props.onRequestAdd()
   }
 
+  onKeyDown(e) {
+    e.stopPropagation()
+
+    if (e.keyCode === 13) {
+      this.props.onAddTag(e.target.value)
+      e.preventDefault()
+      return false
+    } else if (e.keyCode === 32) {
+      e.preventDefault()
+      return false
+    } else {
+      return true
+    }
+  }
+
   renderTag(tag) {
     const { name, count } = tag
     return (
@@ -54,7 +69,12 @@ export default class TagList extends Component {
   renderAddTagInput() {
     return (
       <li className="add">
-        <input ref="addtag" placeholder="Tag name" type="text" />
+        <input
+           type="text"
+           ref="addtag"
+           placeholder="Tag name"
+           onBlur={(e) => this.props.onAddTag(null)}
+           onKeyDown={(e) => this.onKeyDown(e)} />
       </li>
     )
   }
@@ -85,5 +105,6 @@ TagList.propTypes = {
   onSwitchTag: PropTypes.func.isRequired,
   onDropItem: PropTypes.func.isRequired,
   onRequestAdd: PropTypes.func.isRequired,
+  onAddTag: PropTypes.func.isRequired,
 }
 

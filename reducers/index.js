@@ -1,5 +1,5 @@
 import { combineReducers } from 'redux'
-import { SOCKET_RECV, SOCKET_OBJECT, START_DRAG_ITEM, END_DRAG_ITEM, REQUEST_ADD_TAG } from '../actions'
+import { SOCKET_RECV, SOCKET_OBJECT, START_DRAG_ITEM, END_DRAG_ITEM, REQUEST_ADD_TAG, END_ADD_TAG } from '../actions'
 
 
 function ui(state = {
@@ -19,6 +19,10 @@ function ui(state = {
     case REQUEST_ADD_TAG:
       return Object.assign({}, state, {
         addTagItemId: action.itemId
+      })
+    case END_ADD_TAG:
+      return Object.assign({}, state, {
+        addTagItemId: null
       })
     case SOCKET_RECV:
       return Object.assign({}, state, {

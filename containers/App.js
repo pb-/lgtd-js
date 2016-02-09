@@ -2,7 +2,7 @@ import _ from 'lodash'
 import React, { Component, PropTypes } from 'react'
 import ReactDOM from 'react-dom'
 import { connect } from 'react-redux'
-import { socketRecv, socketReady, changeTag, commandSetTitle, commandDeleteItem, commandSetTag, commandUnsetTag, startDragItem, endDragItem, requestAddTag } from '../actions'
+import { socketRecv, socketReady, changeTag, commandSetTitle, commandDeleteItem, commandSetTag, commandUnsetTag, startDragItem, endDragItem, requestAddTag, endAddTag } from '../actions'
 import { generateItemId } from '../util'
 import ItemList from '../components/ItemList'
 import TagList from '../components/TagList'
@@ -67,9 +67,9 @@ class App extends Component {
   }
 
   handleChangeTitle(itemId, title) {
-    const { dispatch } = this.props
-
-    dispatch(commandSetTitle(itemId, title))
+    if (title.length > 0) {
+      this.props.dispatch(commandSetTitle(itemId, title))
+    }
   }
 
   handleStartDragItem(itemId) {
@@ -98,6 +98,14 @@ class App extends Component {
     this.props.dispatch(requestAddTag(this.props.ui.dragItemId))
   }
 
+  handleAddTag(tag) {
+    if (tag !== null && tag.length > 0) {
+        this.props.dispatch(commandSetTag(this.props.ui.addTagItemId, tag))
+    }
+    this.props.dispatch(endAddTag())
+    this.focusAddStuff()
+  }
+
   render() {
     const { tags, items } = this.props
     return (
@@ -111,7 +119,8 @@ class App extends Component {
               showAddTagInput={this.props.ui.addTagItemId !== null}
               onSwitchTag={this.handleTagSwitch.bind(this)}
               onDropItem={this.handleDropItem.bind(this)}
-              onRequestAdd={this.handleRequestAddTag.bind(this)} />
+              onRequestAdd={this.handleRequestAddTag.bind(this)}
+              onAddTag={this.handleAddTag.bind(this)} />
         </div>
         <div id="content">
           <input id="add" placeholder="Add stuff&hellip;" ref="add" type="text" onKeyDown={this.handleAddStuff.bind(this)} />
