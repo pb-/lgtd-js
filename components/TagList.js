@@ -5,10 +5,13 @@ export default class TagList extends Component {
   constructor(props) {
     super(props)
     this.onDropItem = this.onDropItem.bind(this)
+    this.state = {
+      addItemId: null
+    }
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if (!prevProps.showAddTagInput && this.props.showAddTagInput) {
+    if (!prevState.addItemId === null && this.state.addItemId !== null ) {
       ReactDOM.findDOMNode(this.refs.addtag).focus();
     }
   }
@@ -21,19 +24,20 @@ export default class TagList extends Component {
 
   onDropItem(e, tag) {
     e.preventDefault()
-    this.props.onDropItem(tag)
+    this.props.onSetTag(e.dataTransfer.getData('itemId'), tag)
   }
 
-  onRequestAdd(e) {
+  onAddItem(e) {
     e.preventDefault()
-    this.props.onRequestAdd()
+    this.setState({addItemId: e.dataTransfer.getData('itemId')})
   }
 
   onKeyDown(e) {
     e.stopPropagation()
 
     if (e.keyCode === 13) {
-      this.props.onAddTag(e.target.value)
+      this.setState({addItemId: null})
+      this.props.onSetTag(this.state.addItemId, e.target.value)
       e.preventDefault()
       return false
     } else if (e.keyCode === 32) {
@@ -60,7 +64,7 @@ export default class TagList extends Component {
     return (
       <li className="add"
           onDragOver={e => e.preventDefault()}
-          onDrop={e => this.onRequestAdd(e)} >
+          onDrop={e => this.onAddItem(e)} >
         Add new tag…
       </li>
     )
@@ -73,16 +77,16 @@ export default class TagList extends Component {
            type="text"
            ref="addtag"
            placeholder="Tag name"
-           onBlur={(e) => this.props.onAddTag(null)}
+           onBlur={(e) => this.props.onSetTag(null, null)}
            onKeyDown={(e) => this.onKeyDown(e)} />
       </li>
     )
   }
 
-  renderAddTag(showText, showInput) {
+  renderAddTag(draggingItem, showInput) {
     if (showInput) {
       return this.renderAddTagInput()
-    } else if (showText) {
+    } else if (draggingItem) {
       return this.renderAddTagText()
     }
   }
@@ -91,7 +95,7 @@ export default class TagList extends Component {
     return (
       <ul id="tags">
         {this.props.tags.map(tag => this.renderTag(tag))}
-        {this.renderAddTag(this.props.showAddTag, this.props.showAddTagInput)}
+        {this.renderAddTag(this.props.draggingItem, this.state.addItemId !== null)}
       </ul>
     )
   }
@@ -100,11 +104,8 @@ export default class TagList extends Component {
 TagList.propTypes = {
   activeTag: PropTypes.string.isRequired,
   tags: PropTypes.array.isRequired,
-  showAddTag: PropTypes.bool.isRequired,
-  showAddTagInput: PropTypes.bool.isRequired,
+  draggingItem: PropTypes.bool.isRequired,
   onSwitchTag: PropTypes.func.isRequired,
-  onDropItem: PropTypes.func.isRequired,
-  onRequestAdd: PropTypes.func.isRequired,
-  onAddTag: PropTypes.func.isRequired,
+  onSetTag: PropTypes.func.isRequired,
 }
 

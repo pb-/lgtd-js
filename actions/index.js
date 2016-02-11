@@ -2,8 +2,6 @@ export const SOCKET_OBJECT = 'SOCKET_OBJECT'
 export const SOCKET_RECV = 'SOCKET_RECV'
 export const START_DRAG_ITEM = 'START_DRAG_ITEM'
 export const END_DRAG_ITEM = 'END_DRAG_ITEM'
-export const REQUEST_ADD_TAG = 'REQUEST_ADD_TAG'
-export const END_ADD_TAG = 'END_ADD_TAG'
 
 
 function socketRecvState(state) {
@@ -113,10 +111,9 @@ export function commandUnsetTag(itemId) {
 }
 
 
-export function startDragItem(itemId) {
+export function startDragItem() {
   return {
-    type: START_DRAG_ITEM,
-    itemId
+    type: START_DRAG_ITEM
   }
 }
 
@@ -124,20 +121,5 @@ export function startDragItem(itemId) {
 export function endDragItem() {
   return {
     type: END_DRAG_ITEM
-  }
-}
-
-
-export function requestAddTag(itemId) {
-  return {
-    type: REQUEST_ADD_TAG,
-    itemId: itemId
-  }
-}
-
-
-export function endAddTag() {
-  return {
-    type: END_ADD_TAG
   }
 }

@@ -73,37 +73,23 @@ class App extends Component {
   }
 
   handleStartDragItem(itemId) {
-    this.props.dispatch(startDragItem(itemId))
+    this.props.dispatch(startDragItem())
   }
 
   handleEndDragItem() {
     this.props.dispatch(endDragItem())
-
-    if (this.props.ui.addTagItemId === null) {
-      this.focusAddStuff()
-    }
+    this.focusAddStuff()
   }
 
-  handleDropItem(tag) {
+  handleSetTag(itemId, tag) {
     if (tag !== this.props.ui.activeTag && tag !== 'tickler') {
       if (tag === 'inbox') {
-        this.props.dispatch(commandUnsetTag(this.props.ui.dragItemId))
-      } else {
-        this.props.dispatch(commandSetTag(this.props.ui.dragItemId, tag))
+        //this.props.dispatch(commandUnsetTag(itemId))
+      } else if (tag !== null && tag.length > 0) {
+        console.log('set set on ' + itemId + ': ' + tag)
+        //this.props.dispatch(commandSetTag(itemId, tag))
       }
     }
-  }
-
-  handleRequestAddTag() {
-    this.props.dispatch(requestAddTag(this.props.ui.dragItemId))
-  }
-
-  handleAddTag(tag) {
-    if (tag !== null && tag.length > 0) {
-        this.props.dispatch(commandSetTag(this.props.ui.addTagItemId, tag))
-    }
-    this.props.dispatch(endAddTag())
-    this.focusAddStuff()
   }
 
   render() {
@@ -115,12 +101,9 @@ class App extends Component {
           <TagList
               tags={tags}
               activeTag={this.props.ui.activeTag}
-              showAddTag={this.props.ui.dragItemId !== null}
-              showAddTagInput={this.props.ui.addTagItemId !== null}
+              draggingItem={this.props.ui.draggingItem}
               onSwitchTag={this.handleTagSwitch.bind(this)}
-              onDropItem={this.handleDropItem.bind(this)}
-              onRequestAdd={this.handleRequestAddTag.bind(this)}
-              onAddTag={this.handleAddTag.bind(this)} />
+              onSetTag={this.handleSetTag.bind(this)} />
         </div>
         <div id="content">
           <input id="add" placeholder="Add stuff&hellip;" ref="add" type="text" onKeyDown={this.handleAddStuff.bind(this)} />

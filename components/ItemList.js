@@ -38,6 +38,7 @@ export default class ItemList extends Component {
 
   onStartDrag(e, item) {
     e.dataTransfer.setData('text/plain', item.title)
+    e.dataTransfer.setData('itemId', item.id)
     this.props.onStartDrag(item.id)
   }
 
