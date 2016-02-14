@@ -77,8 +77,8 @@ class App extends Component {
   }
 
   handleEndDragItem(successful) {
-    this.props.dispatch(endDragItem())
     if (!successful) {
+      this.props.dispatch(endDragItem())
       this.focusAddStuff()
     }
   }
@@ -90,6 +90,7 @@ class App extends Component {
       } else if (tag !== null && tag.length > 0) {
         this.props.dispatch(commandSetTag(itemId, tag))
       }
+      this.props.dispatch(endDragItem())
     }
     this.focusAddStuff()
   }
