@@ -46,6 +46,12 @@ export default class ItemList extends Component {
     this.props.onEndDrag(e.dataTransfer.dropEffect !== 'none')
   }
 
+  renderScheduleDate(item) {
+    if (item.scheduled !== undefined) {
+      return <span className="date">&emsp;{item.scheduled}</span>
+    }
+  }
+
   renderItem(item) {
     if (item.id === this.state.editItemId) {
       return (
@@ -66,7 +72,7 @@ export default class ItemList extends Component {
                 onClick={e => this.onStartEdit(e, item.id)}
                 onDragStart={e => this.onStartDrag(e, item)}
                 onDragEnd={this.onEndDrag.bind(this)}>
-            {item.title}
+            {item.title}{this.renderScheduleDate(item)}
           </span>
           <a className="btn" onClick={e => this.props.onDelete(e, item.id)}>
             remove
