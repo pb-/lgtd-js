@@ -2,7 +2,7 @@ import _ from 'lodash'
 import React, { Component, PropTypes } from 'react'
 import ReactDOM from 'react-dom'
 import { connect } from 'react-redux'
-import { socketRecv, socketReady, changeTag, commandSetTitle, commandDeleteItem, commandSetTag, commandUnsetTag, startDragItem, endDragItem, requestAddTag, endAddTag } from '../actions'
+import { socketRecv, socketReady, changeTag, commandSetTitle, commandDeleteTag, commandDeleteItem, commandSetTag, commandUnsetTag, startDragItem, endDragItem, requestAddTag, endAddTag } from '../actions'
 import { generateItemId } from '../util'
 import ItemList from '../components/ItemList'
 import TagList from '../components/TagList'
@@ -95,6 +95,11 @@ class App extends Component {
     this.focusAddStuff()
   }
 
+  handleDeleteTag(tag) {
+    this.props.dispatch(commandDeleteTag(tag))
+    this.focusAddStuff()
+  }
+
   handleCancelAdd() {
     this.focusAddStuff()
   }
@@ -111,7 +116,8 @@ class App extends Component {
               draggingItem={this.props.ui.draggingItem}
               onSwitchTag={this.handleTagSwitch.bind(this)}
               onSetTag={this.handleSetTag.bind(this)}
-              onCancelAdd={this.handleCancelAdd.bind(this)} />
+              onCancelAdd={this.handleCancelAdd.bind(this)}
+              onDeleteTag={this.handleDeleteTag.bind(this)} />
         </div>
         <div id="content">
           <input

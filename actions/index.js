@@ -50,6 +50,11 @@ function cmdUnsetTag(itemId) {
 }
 
 
+function cmdDeleteTag(tag) {
+  return 'r ' + tag
+}
+
+
 export function socketReady(socket) {
   return (dispatch, getState) => {
     dispatch(socketObj(socket))
@@ -107,6 +112,13 @@ export function commandSetTag(itemId, tag) {
 export function commandUnsetTag(itemId) {
   return (dispatch, getState) => {
     getState().socket.send(socketPushCommands([cmdUnsetTag(itemId)]))
+  }
+}
+
+
+export function commandDeleteTag(tag) {
+  return (dispatch, getState) => {
+    getState().socket.send(socketPushCommands([cmdDeleteTag(tag)]))
   }
 }
 

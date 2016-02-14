@@ -50,6 +50,17 @@ export default class TagList extends Component {
     this.props.onCancelAdd()
   }
 
+  onDeleteTag(e, tag) {
+    e.stopPropagation()
+    this.props.onDeleteTag(tag)
+  }
+
+  renderDeleteLink(tag) {
+    if (tag.count === 0) {
+      return <a className="remove" onClick={e => this.onDeleteTag(e, tag.name)}>❌</a>
+    }
+  }
+
   renderCount(n) {
     if (n > 0) {
       return <span className="count">&ensp;{n}</span>
@@ -63,7 +74,8 @@ export default class TagList extends Component {
           onClick={e => this.props.onSwitchTag(e, name)}
           onDragOver={e => e.preventDefault()}
           onDrop={e => this.onDropItem(e, name)} >
-        <a>{name}{this.renderCount(count)}</a>
+        {name}{this.renderCount(count)}
+        {this.renderDeleteLink(tag)}
       </li>
     )
   }
@@ -116,5 +128,6 @@ TagList.propTypes = {
   onSwitchTag: PropTypes.func.isRequired,
   onSetTag: PropTypes.func.isRequired,
   onCancelAdd: PropTypes.func.isRequired,
+  onDeleteTag: PropTypes.func.isRequired,
 }
 
