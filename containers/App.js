@@ -87,13 +87,11 @@ class App extends Component {
     if (tag !== this.props.ui.activeTag && tag !== 'tickler') {
       if (tag === 'inbox') {
         this.props.dispatch(commandUnsetTag(itemId))
-        this.focusAddStuff()
       } else if (tag !== null && tag.length > 0) {
-        console.log('set set on ' + itemId + ': ' + tag)
         this.props.dispatch(commandSetTag(itemId, tag))
-        this.focusAddStuff()
       }
     }
+    this.focusAddStuff()
   }
 
   handleCancelAdd() {
