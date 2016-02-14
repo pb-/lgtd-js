@@ -101,6 +101,7 @@ class App extends Component {
   }
 
   handleCancelAdd() {
+    this.props.dispatch(endDragItem())
     this.focusAddStuff()
   }
 
