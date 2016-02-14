@@ -42,6 +42,10 @@ export default class ItemList extends Component {
     this.props.onStartDrag(item.id)
   }
 
+  onEndDrag(e) {
+    this.props.onEndDrag(e.dataTransfer.dropEffect !== 'none')
+  }
+
   renderItem(item) {
     if (item.id === this.state.editItemId) {
       return (
@@ -61,7 +65,7 @@ export default class ItemList extends Component {
           <span draggable
                 onClick={e => this.onStartEdit(e, item.id)}
                 onDragStart={e => this.onStartDrag(e, item)}
-                onDragEnd={e => this.props.onEndDrag()}>
+                onDragEnd={this.onEndDrag.bind(this)}>
             {item.title}
           </span>
           <a className="btn" onClick={e => this.props.onDelete(e, item.id)}>

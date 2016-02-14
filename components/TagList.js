@@ -11,14 +11,8 @@ export default class TagList extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if (!prevState.addItemId === null && this.state.addItemId !== null ) {
+    if (prevState.addItemId === null && this.state.addItemId !== null) {
       ReactDOM.findDOMNode(this.refs.addtag).focus();
-    }
-  }
-
-  renderCount(n) {
-    if (n > 0) {
-      return <span className="count">&ensp;{n}</span>
     }
   }
 
@@ -35,16 +29,30 @@ export default class TagList extends Component {
   onKeyDown(e) {
     e.stopPropagation()
 
-    if (e.keyCode === 13) {
-      this.setState({addItemId: null})
-      this.props.onSetTag(this.state.addItemId, e.target.value)
+    if (e.keyCode === 13 || e.keyCode === 27 || e.keyCode === 32) {
       e.preventDefault()
+
+      if (e.keyCode === 13) {
+        this.setState({addItemId: null})
+        this.props.onSetTag(this.state.addItemId, e.target.value)
+      } else if (e.keyCode === 27) {
+        this.onCancelAdd()
+      }
+
       return false
-    } else if (e.keyCode === 32) {
-      e.preventDefault()
-      return false
-    } else {
-      return true
+    }
+
+    return true
+  }
+
+  onCancelAdd(e) {
+    this.setState({addItemId: null})
+    this.props.onCancelAdd()
+  }
+
+  renderCount(n) {
+    if (n > 0) {
+      return <span className="count">&ensp;{n}</span>
     }
   }
 
@@ -77,8 +85,8 @@ export default class TagList extends Component {
            type="text"
            ref="addtag"
            placeholder="Tag name"
-           onBlur={(e) => this.props.onSetTag(null, null)}
-           onKeyDown={(e) => this.onKeyDown(e)} />
+           onBlur={this.onCancelAdd.bind(this)}
+           onKeyDown={this.onKeyDown.bind(this)} />
       </li>
     )
   }
@@ -107,5 +115,6 @@ TagList.propTypes = {
   draggingItem: PropTypes.bool.isRequired,
   onSwitchTag: PropTypes.func.isRequired,
   onSetTag: PropTypes.func.isRequired,
+  onCancelAdd: PropTypes.func.isRequired,
 }
 

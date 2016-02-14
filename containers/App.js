@@ -76,20 +76,28 @@ class App extends Component {
     this.props.dispatch(startDragItem())
   }
 
-  handleEndDragItem() {
+  handleEndDragItem(successful) {
     this.props.dispatch(endDragItem())
-    this.focusAddStuff()
+    if (!successful) {
+      this.focusAddStuff()
+    }
   }
 
   handleSetTag(itemId, tag) {
     if (tag !== this.props.ui.activeTag && tag !== 'tickler') {
       if (tag === 'inbox') {
-        //this.props.dispatch(commandUnsetTag(itemId))
+        this.props.dispatch(commandUnsetTag(itemId))
+        this.focusAddStuff()
       } else if (tag !== null && tag.length > 0) {
         console.log('set set on ' + itemId + ': ' + tag)
-        //this.props.dispatch(commandSetTag(itemId, tag))
+        this.props.dispatch(commandSetTag(itemId, tag))
+        this.focusAddStuff()
       }
     }
+  }
+
+  handleCancelAdd() {
+    this.focusAddStuff()
   }
 
   render() {
@@ -103,15 +111,21 @@ class App extends Component {
               activeTag={this.props.ui.activeTag}
               draggingItem={this.props.ui.draggingItem}
               onSwitchTag={this.handleTagSwitch.bind(this)}
-              onSetTag={this.handleSetTag.bind(this)} />
+              onSetTag={this.handleSetTag.bind(this)}
+              onCancelAdd={this.handleCancelAdd.bind(this)} />
         </div>
         <div id="content">
-          <input id="add" placeholder="Add stuff&hellip;" ref="add" type="text" onKeyDown={this.handleAddStuff.bind(this)} />
+          <input
+              id="add"
+              placeholder="Add stuff&hellip;"
+              ref="add"
+              type="text"
+              onKeyDown={this.handleAddStuff.bind(this)} />
           <ItemList items={items}
-                    onDelete={this.handleDeleteItem.bind(this)}
-                    onChangeTitle={this.handleChangeTitle.bind(this)}
-                    onStartDrag={this.handleStartDragItem.bind(this)}
-                    onEndDrag={this.handleEndDragItem.bind(this)} />
+              onDelete={this.handleDeleteItem.bind(this)}
+              onChangeTitle={this.handleChangeTitle.bind(this)}
+              onStartDrag={this.handleStartDragItem.bind(this)}
+              onEndDrag={this.handleEndDragItem.bind(this)} />
         </div>
       </div>
     )
