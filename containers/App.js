@@ -100,7 +100,7 @@ class App extends Component {
     this.focusAddStuff()
   }
 
-  handleCancelAdd() {
+  handleCancelProcessing() {
     this.props.dispatch(endDragItem())
     this.focusAddStuff()
   }
@@ -117,7 +117,7 @@ class App extends Component {
               draggingItem={this.props.ui.draggingItem}
               onSwitchTag={this.handleTagSwitch.bind(this)}
               onSetTag={this.handleSetTag.bind(this)}
-              onCancelAdd={this.handleCancelAdd.bind(this)}
+              onCancel={this.handleCancelProcessing.bind(this)}
               onDeleteTag={this.handleDeleteTag.bind(this)} />
         </div>
         <div id="content">

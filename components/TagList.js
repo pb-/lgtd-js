@@ -87,7 +87,14 @@ export default class TagList extends Component {
 
   onCancelAdd(e) {
     this.setState({addItemId: null})
-    this.props.onCancelAdd()
+    this.props.onCancel()
+  }
+
+  onCancelSchedule(e) {
+    e.preventDefault()
+    e.stopPropagation()
+    this.setState({scheduleItemId: null})
+    this.props.onCancel()
   }
 
   onDeleteTag(e, tag) {
@@ -141,6 +148,11 @@ export default class TagList extends Component {
             {moment.weekdaysMin().map(day => <th key={day}>{day}</th>)}
           </tr>
         </thead>
+        <tfoot>
+          <tr>
+            <td onClick={this.onCancelSchedule.bind(this)} colSpan="7">Cancel</td>
+          </tr>
+        </tfoot>
         <tbody>
           {weeks.map((week, i) =>
             <tr key={i}>
@@ -216,7 +228,7 @@ TagList.propTypes = {
   draggingItem: PropTypes.bool.isRequired,
   onSwitchTag: PropTypes.func.isRequired,
   onSetTag: PropTypes.func.isRequired,
-  onCancelAdd: PropTypes.func.isRequired,
+  onCancel: PropTypes.func.isRequired,
   onDeleteTag: PropTypes.func.isRequired,
 }
 
