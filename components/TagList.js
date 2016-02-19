@@ -140,7 +140,7 @@ export default class TagList extends Component {
       <table>
         <thead>
           <tr>
-            <th colSpan="5">{month.format('MMMM YYYY')}</th>
+            <th colSpan="5" className="month">{month.format('MMMM YYYY')}</th>
             <th onClick={e => this.onChangeMonth(e, -1)}>◂</th>
             <th onClick={e => this.onChangeMonth(e, +1)}>▸</th>
           </tr>
