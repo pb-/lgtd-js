@@ -141,8 +141,8 @@ export default class TagList extends Component {
         <thead>
           <tr>
             <th colSpan="5" className="month">{month.format('MMMM YYYY')}</th>
-            <th onClick={e => this.onChangeMonth(e, -1)}>◂</th>
-            <th onClick={e => this.onChangeMonth(e, +1)}>▸</th>
+            <th className="clickable" onClick={e => this.onChangeMonth(e, -1)}>◂</th>
+            <th className="clickable" onClick={e => this.onChangeMonth(e, +1)}>▸</th>
           </tr>
           <tr>
             {moment.weekdaysMin().map(day => <th key={day}>{day}</th>)}
@@ -150,14 +150,17 @@ export default class TagList extends Component {
         </thead>
         <tfoot>
           <tr>
-            <td onClick={this.onCancelSchedule.bind(this)} colSpan="7">Cancel</td>
+            <td
+              className="clickable"
+              onClick={this.onCancelSchedule.bind(this)}
+              colSpan="7">Cancel</td>
           </tr>
         </tfoot>
         <tbody>
           {weeks.map((week, i) =>
             <tr key={i}>
               {week.map((day, j) =>
-                <td key={j} onClick={e => this.onSchedule(e, day)}>
+                <td className="clickable" key={j} onClick={e => this.onSchedule(e, day)}>
                   {day === null ? '' : day.date()}
                 </td>)}
             </tr>)}

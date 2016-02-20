@@ -103,6 +103,11 @@ body {
 }
 
 #tags li table {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+
   text-align: center;
   font-size: smaller;
   font-weight: normal;
@@ -112,6 +117,16 @@ body {
 
 #tags li table thead tr th.month {
   text-align: left;
+}
+
+#tags li table .clickable:hover {
+  background-color: #e1bee7;
+  color: #8e44ad;
+}
+
+#tags li.active table .clickable:hover {
+  background-color: #212121;
+  color: #f1c40f;
 }
 
 #content {
