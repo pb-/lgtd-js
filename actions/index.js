@@ -2,9 +2,10 @@ import md5 from 'blueimp-md5'
 
 export const SOCKET_OBJECT = 'SOCKET_OBJECT'
 export const SOCKET_RECV_STATE = 'SOCKET_RECV_STATE'
-export const SOCKET_RECV_AUTH_CHALLENGE = 'SOCKET_RECV_AUTH_CHALLENGE'
+export const AUTH_TOKEN = 'AUTH_TOKEN'
 export const START_DRAG_ITEM = 'START_DRAG_ITEM'
 export const END_DRAG_ITEM = 'END_DRAG_ITEM'
+export const AUTHENTICATED = 'AUTHENTICATED'
 
 
 function socketRecvState(state) {
@@ -15,18 +16,17 @@ function socketRecvState(state) {
 }
 
 
-function socketRecvAuthChallenge(nonce) {
-  return {
-    type: SOCKET_RECV_AUTH_CHALLENGE,
-    nonce,
-  }
-}
-
-
 function socketObj(socket) {
   return {
     type: SOCKET_OBJECT,
     socket
+  }
+}
+
+
+function authenticated() {
+  return {
+    type: AUTHENTICATED,
   }
 }
 
@@ -41,8 +41,8 @@ function socketPushCommands(commands) {
 }
 
 
-function socketSendAuthResponse(key, nonce) {
-  return JSON.stringify({msg: 'auth_response', mac: md5(key, nonce)})
+function socketSendAuthResponse(token, nonce) {
+  return JSON.stringify({msg: 'auth_response', mac: md5(nonce, token)})
 }
 
 
@@ -71,24 +71,37 @@ function cmdDeleteTag(tag) {
 }
 
 
-export function socketReady(socket) {
+function socketReady(socket) {
   return (dispatch, getState) => {
     dispatch(socketObj(socket))
-    // socket.send(socketRequestState(getState().ui.activeTag))
   }
 }
 
 
-export function socketRecv(socket, data) {
+function socketRecv(socket, data) {
   return (dispatch, getState) => {
     switch (data.msg) {
       case 'auth_challenge':
-        return dispatch(socketRecvAuthChallenge(data.nonce))
+        return socket.send(socketSendAuthResponse(getState().ui.authToken, data.nonce))
       case 'state':
         return dispatch(socketRecvState(data.state))
-      case 'new_state':
       case 'authenticated':
+        dispatch(authenticated())  // intentional fall through
+      case 'new_state':
         return socket.send(socketRequestState(getState().ui.activeTag))
+    }
+  }
+}
+
+
+export function connectSocket() {
+  return dispatch => {
+    let socket = new WebSocket('ws://127.0.0.1:9001/gtd')
+    socket.onopen = () => {
+      dispatch(socketReady(socket))
+    }
+    socket.onmessage = (event) => {
+      dispatch(socketRecv(socket, JSON.parse(event.data)))
     }
   }
 }
@@ -159,5 +172,13 @@ export function startDragItem() {
 export function endDragItem() {
   return {
     type: END_DRAG_ITEM
+  }
+}
+
+
+export function authToken(token) {
+  return {
+    type: AUTH_TOKEN,
+    token,
   }
 }

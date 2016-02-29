@@ -1,12 +1,12 @@
 import { combineReducers } from 'redux'
-import { SOCKET_RECV_AUTH_CHALLENGE, SOCKET_RECV_STATE, SOCKET_OBJECT, START_DRAG_ITEM, END_DRAG_ITEM } from '../actions'
+import { AUTH_TOKEN, AUTHENTICATED, SOCKET_RECV_STATE, SOCKET_OBJECT, START_DRAG_ITEM, END_DRAG_ITEM } from '../actions'
 
 
 function ui(state = {
   activeTag: 'inbox',
   draggingItem: false,
   authenticated: false,
-  nonce: null,
+  authToken: null,
 }, action) {
   switch (action.type) {
     case START_DRAG_ITEM:
@@ -21,9 +21,14 @@ function ui(state = {
       return Object.assign({}, state, {
         activeTag: action.state.tags[action.state.active_tag].name
       })
-    case SOCKET_RECV_AUTH_CHALLENGE:
+    case AUTH_TOKEN:
       return Object.assign({}, state, {
-        nonce: action.nonce
+        authToken: action.token
+      })
+    case AUTHENTICATED:
+      return Object.assign({}, state, {
+        authenticated: true,
+        authToken: '<removed>',  // no need to keep it in memory any longer
       })
     default:
       return state

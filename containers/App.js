@@ -2,7 +2,7 @@ import _ from 'lodash'
 import React, { Component, PropTypes } from 'react'
 import ReactDOM from 'react-dom'
 import { connect } from 'react-redux'
-import { socketRecv, socketReady, changeTag, commandSetTitle, commandDeleteTag, commandDeleteItem, commandSetTag, commandUnsetTag, startDragItem, endDragItem, requestAddTag, endAddTag } from '../actions'
+import { authToken, connectSocket, changeTag, commandSetTitle, commandDeleteTag, commandDeleteItem, commandSetTag, commandUnsetTag, startDragItem, endDragItem, requestAddTag, endAddTag } from '../actions'
 import { generateItemId } from '../util'
 import ItemList from '../components/ItemList'
 import TagList from '../components/TagList'
@@ -15,13 +15,9 @@ class App extends Component {
   componentDidMount() {
     const { dispatch } = this.props
 
-    let socket = new WebSocket('ws://127.0.0.1:9001/gtd')
-    socket.onopen = () => {
-      dispatch(socketReady(socket))
-    }
-    socket.onmessage = (event) => {
-      dispatch(socketRecv(socket, JSON.parse(event.data)))
-    }
+
+    dispatch(authToken(''))
+    dispatch(connectSocket())
 
     this.focusAddStuff()
     window.addEventListener('keydown', (e) => this.focusAddStuff())
