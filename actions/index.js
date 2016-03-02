@@ -31,6 +31,14 @@ function authenticated() {
 }
 
 
+function authToken(token) {
+  return {
+    type: AUTH_TOKEN,
+    token,
+  }
+}
+
+
 function socketRequestState(tag) {
   return JSON.stringify({msg: 'request_state', tag})
 }
@@ -85,7 +93,11 @@ function socketRecv(socket, data) {
         return socket.send(socketSendAuthResponse(getState().ui.authToken, data.nonce))
       case 'state':
         return dispatch(socketRecvState(data.state))
+      case 'bad_credentials':
+        localStorage.removeItem('authToken')
+        return socket.close()
       case 'authenticated':
+        localStorage.setItem('authToken', getState().ui.authToken)
         dispatch(authenticated())  // intentional fall through
       case 'new_state':
         return socket.send(socketRequestState(getState().ui.activeTag))
@@ -94,7 +106,7 @@ function socketRecv(socket, data) {
 }
 
 
-export function connectSocket() {
+function connectSocket() {
   return dispatch => {
     let socket = new WebSocket('ws://127.0.0.1:9001/gtd')
     socket.onopen = () => {
@@ -103,6 +115,14 @@ export function connectSocket() {
     socket.onmessage = (event) => {
       dispatch(socketRecv(socket, JSON.parse(event.data)))
     }
+  }
+}
+
+
+export function authenticate(token) {
+  return dispatch => {
+    dispatch(authToken(token))
+    dispatch(connectSocket())
   }
 }
 
@@ -155,13 +175,6 @@ export function commandDeleteTag(tag) {
 }
 
 
-export function authenticate(key, nonce) {
-  return (dispatch, getState) => {
-    getState().socket.send(socketSendAuthResponse(key, nonce))
-  }
-}
-
-
 export function startDragItem() {
   return {
     type: START_DRAG_ITEM
@@ -172,13 +185,5 @@ export function startDragItem() {
 export function endDragItem() {
   return {
     type: END_DRAG_ITEM
-  }
-}
-
-
-export function authToken(token) {
-  return {
-    type: AUTH_TOKEN,
-    token,
   }
 }

@@ -2,7 +2,7 @@ import _ from 'lodash'
 import React, { Component, PropTypes } from 'react'
 import ReactDOM from 'react-dom'
 import { connect } from 'react-redux'
-import { authToken, connectSocket, changeTag, commandSetTitle, commandDeleteTag, commandDeleteItem, commandSetTag, commandUnsetTag, startDragItem, endDragItem, requestAddTag, endAddTag } from '../actions'
+import { authenticate, changeTag, commandSetTitle, commandDeleteTag, commandDeleteItem, commandSetTag, commandUnsetTag, startDragItem, endDragItem, requestAddTag, endAddTag } from '../actions'
 import { generateItemId } from '../util'
 import ItemList from '../components/ItemList'
 import TagList from '../components/TagList'
@@ -15,16 +15,18 @@ class App extends Component {
   componentDidMount() {
     const { dispatch } = this.props
 
-
-    dispatch(authToken(''))
-    dispatch(connectSocket())
-
-    this.focusAddStuff()
+    const token = localStorage.getItem('authToken')
+    if (token !== null) {
+      dispatch(authenticate(token))
+    }
     window.addEventListener('keydown', (e) => this.focusAddStuff())
   }
 
   focusAddStuff() {
-    ReactDOM.findDOMNode(this.refs.add).focus();
+    const node = ReactDOM.findDOMNode(this.refs.add)
+    if (node !== null) {
+      node.focus()
+    }
   }
 
   handleTagSwitch(e, tag) {
@@ -51,6 +53,14 @@ class App extends Component {
       return false
     } else {
       return true
+    }
+  }
+
+  handleSubmitToken(e) {
+    if (e.keyCode === 13) {
+      e.preventDefault()
+      e.stopPropagation()
+      this.props.dispatch(authenticate(e.target.value))
     }
   }
 
@@ -101,7 +111,7 @@ class App extends Component {
     this.focusAddStuff()
   }
 
-  render() {
+  renderApp() {
     const { tags, items } = this.props
     return (
       <div>
@@ -118,6 +128,7 @@ class App extends Component {
         </div>
         <div id="content">
           <input
+              autoFocus
               id="add"
               placeholder="Add stuff&hellip;"
               ref="add"
@@ -131,6 +142,19 @@ class App extends Component {
         </div>
       </div>
     )
+  }
+
+  render() {
+    if (this.props.ui.authenticated) {
+      return this.renderApp()
+    } else {
+      return (
+        <input
+            type="text"
+            placeholder="Token"
+            onKeyDown={this.handleSubmitToken.bind(this)} />
+      )
+    }
   }
 }
 
