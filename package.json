@@ -41,6 +41,8 @@
     "expect": "^1.6.0",
     "express": "^4.13.3",
     "node-libs-browser": "^0.5.2",
+    "standard": "^6.0.7",
+    "standard-loader": "^3.0.0",
     "webpack": "^1.9.11",
     "webpack-dev-middleware": "^1.2.0",
     "webpack-hot-middleware": "^2.2.0"

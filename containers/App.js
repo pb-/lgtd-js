@@ -1,35 +1,30 @@
-import _ from 'lodash'
 import React, { Component, PropTypes } from 'react'
 import ReactDOM from 'react-dom'
 import { connect } from 'react-redux'
-import { authenticate, changeTag, commandSetTitle, commandDeleteTag, commandDeleteItem, commandSetTag, commandUnsetTag, startDragItem, endDragItem, requestAddTag, endAddTag } from '../actions'
+import { authenticate, changeTag, commandSetTitle, commandDeleteTag, commandDeleteItem, commandSetTag, commandUnsetTag, startDragItem, endDragItem } from '../actions'
 import { generateItemId } from '../util'
 import ItemList from '../components/ItemList'
 import TagList from '../components/TagList'
 
 class App extends Component {
-  constructor(props) {
-    super(props)
-  }
-
-  componentDidMount() {
+  componentDidMount () {
     const { dispatch } = this.props
 
-    const token = localStorage.getItem('authToken')
+    const token = window.localStorage.getItem('authToken')
     if (token !== null) {
       dispatch(authenticate(token))
     }
     window.addEventListener('keydown', (e) => this.focusAddStuff())
   }
 
-  focusAddStuff() {
+  focusAddStuff () {
     const node = ReactDOM.findDOMNode(this.refs.add)
     if (node !== null) {
       node.focus()
     }
   }
 
-  handleTagSwitch(e, tag) {
+  handleTagSwitch (e, tag) {
     e.preventDefault()
 
     const { dispatch } = this.props
@@ -37,7 +32,7 @@ class App extends Component {
     this.focusAddStuff()
   }
 
-  handleAddStuff(e) {
+  handleAddStuff (e) {
     const { dispatch, ui } = this.props
     e.stopPropagation()
 
@@ -56,7 +51,7 @@ class App extends Component {
     }
   }
 
-  handleSubmitToken(e) {
+  handleSubmitToken (e) {
     if (e.keyCode === 13) {
       e.preventDefault()
       e.stopPropagation()
@@ -64,7 +59,7 @@ class App extends Component {
     }
   }
 
-  handleDeleteItem(e, item_id) {
+  handleDeleteItem (e, item_id) {
     const { dispatch } = this.props
 
     e.preventDefault()
@@ -72,24 +67,24 @@ class App extends Component {
     this.focusAddStuff()
   }
 
-  handleChangeTitle(itemId, title) {
+  handleChangeTitle (itemId, title) {
     if (title.length > 0) {
       this.props.dispatch(commandSetTitle(itemId, title))
     }
   }
 
-  handleStartDragItem(itemId) {
+  handleStartDragItem (itemId) {
     this.props.dispatch(startDragItem())
   }
 
-  handleEndDragItem(successful) {
+  handleEndDragItem (successful) {
     if (!successful) {
       this.props.dispatch(endDragItem())
       this.focusAddStuff()
     }
   }
 
-  handleSetTag(itemId, tag) {
+  handleSetTag (itemId, tag) {
     if (tag !== this.props.ui.activeTag && tag !== 'tickler') {
       if (tag === 'inbox') {
         this.props.dispatch(commandUnsetTag(itemId))
@@ -101,58 +96,58 @@ class App extends Component {
     this.focusAddStuff()
   }
 
-  handleDeleteTag(tag) {
+  handleDeleteTag (tag) {
     this.props.dispatch(commandDeleteTag(tag))
     this.focusAddStuff()
   }
 
-  handleCancelProcessing() {
+  handleCancelProcessing () {
     this.props.dispatch(endDragItem())
     this.focusAddStuff()
   }
 
-  renderApp() {
+  renderApp () {
     const { tags, items } = this.props
     return (
       <div>
-        <div id="menu">
-          <p id="thead">lgtd-jsclient</p>
+        <div id='menu'>
+          <p id='thead'>lgtd-jsclient</p>
           <TagList
-              tags={tags}
-              activeTag={this.props.ui.activeTag}
-              draggingItem={this.props.ui.draggingItem}
-              onSwitchTag={this.handleTagSwitch.bind(this)}
-              onSetTag={this.handleSetTag.bind(this)}
-              onCancel={this.handleCancelProcessing.bind(this)}
-              onDeleteTag={this.handleDeleteTag.bind(this)} />
+            tags={tags}
+            activeTag={this.props.ui.activeTag}
+            draggingItem={this.props.ui.draggingItem}
+            onSwitchTag={this.handleTagSwitch.bind(this)}
+            onSetTag={this.handleSetTag.bind(this)}
+            onCancel={this.handleCancelProcessing.bind(this)}
+            onDeleteTag={this.handleDeleteTag.bind(this)} />
         </div>
-        <div id="content">
+        <div id='content'>
           <input
-              autoFocus
-              id="add"
-              placeholder="Add stuff&hellip;"
-              ref="add"
-              type="text"
-              onKeyDown={this.handleAddStuff.bind(this)} />
+            autoFocus
+            id='add'
+            placeholder='Add stuff&hellip;'
+            ref='add'
+            type='text'
+            onKeyDown={this.handleAddStuff.bind(this)} />
           <ItemList items={items}
-              onDelete={this.handleDeleteItem.bind(this)}
-              onChangeTitle={this.handleChangeTitle.bind(this)}
-              onStartDrag={this.handleStartDragItem.bind(this)}
-              onEndDrag={this.handleEndDragItem.bind(this)} />
+            onDelete={this.handleDeleteItem.bind(this)}
+            onChangeTitle={this.handleChangeTitle.bind(this)}
+            onStartDrag={this.handleStartDragItem.bind(this)}
+            onEndDrag={this.handleEndDragItem.bind(this)} />
         </div>
       </div>
     )
   }
 
-  render() {
+  render () {
     if (this.props.ui.authenticated) {
       return this.renderApp()
     } else {
       return (
         <input
-            type="text"
-            placeholder="Token"
-            onKeyDown={this.handleSubmitToken.bind(this)} />
+          type='text'
+          placeholder='Token'
+          onKeyDown={this.handleSubmitToken.bind(this)} />
       )
     }
   }
@@ -160,10 +155,10 @@ class App extends Component {
 
 App.propTypes = {
   tags: PropTypes.array.isRequired,
-  items: PropTypes.array.isRequired,
+  items: PropTypes.array.isRequired
 }
 
-function mapStateToProps(state, props) {
+function mapStateToProps (state, props) {
   const { socket, tags, items, ui } = state
 
   return {

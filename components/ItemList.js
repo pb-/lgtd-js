@@ -1,21 +1,21 @@
 import React, { PropTypes, Component } from 'react'
 
 export default class ItemList extends Component {
-  constructor(props) {
+  constructor (props) {
     super(props)
     this.state = {editItemId: null}
     this.onStartEdit = this.onStartEdit.bind(this)
     this.onEditKeyDown = this.onEditKeyDown.bind(this)
     this.onCancelEdit = this.onCancelEdit.bind(this)
     this.onFocus = this.onFocus.bind(this)
-    this.onStartDrag= this.onStartDrag.bind(this)
+    this.onStartDrag = this.onStartDrag.bind(this)
   }
 
-  onStartEdit(e, itemId) {
+  onStartEdit (e, itemId) {
     this.setState({editItemId: itemId})
   }
 
-  onEditKeyDown(e) {
+  onEditKeyDown (e) {
     e.stopPropagation()
 
     if (e.keyCode === 13) {
@@ -27,54 +27,56 @@ export default class ItemList extends Component {
     }
   }
 
-  onCancelEdit(e) {
+  onCancelEdit (e) {
     this.setState({editItemId: null})
   }
 
-  onFocus(e) {
+  onFocus (e) {
     const el = e.target
     el.selectionStart = el.selectionEnd = el.value.length
   }
 
-  onStartDrag(e, item) {
+  onStartDrag (e, item) {
     e.dataTransfer.setData('text/plain', item.title)
     e.dataTransfer.setData('itemId', item.id)
     this.props.onStartDrag(item.id)
   }
 
-  onEndDrag(e) {
+  onEndDrag (e) {
     this.props.onEndDrag(e.dataTransfer.dropEffect !== 'none')
   }
 
-  renderScheduleDate(item) {
+  renderScheduleDate (item) {
     if (item.scheduled !== undefined) {
-      return <span className="date">&emsp;{item.scheduled}</span>
+      return <span className='date'>&emsp;{item.scheduled}</span>
     }
   }
 
-  renderItem(item) {
+  renderItem (item) {
     if (item.id === this.state.editItemId) {
       return (
         <li key={item.id}>
           <input autoFocus
-                 id="editItem"
-                 type="text"
-                 defaultValue={item.title}
-                 onKeyDown={this.onEditKeyDown}
-                 onBlur={this.onCancelEdit}
-                 onFocus={this.onFocus} />
+            id='editItem'
+            type='text'
+            defaultValue={item.title}
+            onKeyDown={this.onEditKeyDown}
+            onBlur={this.onCancelEdit}
+            onFocus={this.onFocus}
+          />
         </li>
       )
     } else {
       return (
         <li key={item.id}>
           <span draggable
-                onClick={e => this.onStartEdit(e, item.id)}
-                onDragStart={e => this.onStartDrag(e, item)}
-                onDragEnd={this.onEndDrag.bind(this)}>
+            onClick={(e) => this.onStartEdit(e, item.id)}
+            onDragStart={(e) => this.onStartDrag(e, item)}
+            onDragEnd={this.onEndDrag.bind(this)}
+          >
             {item.title}{this.renderScheduleDate(item)}
           </span>
-          <a className="btn" onClick={e => this.props.onDelete(e, item.id)}>
+          <a className='btn' onClick={(e) => this.props.onDelete(e, item.id)}>
             remove
           </a>
         </li>
@@ -82,10 +84,10 @@ export default class ItemList extends Component {
     }
   }
 
-  render() {
+  render () {
     return (
-      <ul id="items">
-        {this.props.items.map(item => this.renderItem(item))}
+      <ul id='items'>
+        {this.props.items.map((item) => this.renderItem(item))}
       </ul>
     )
   }
@@ -96,5 +98,5 @@ ItemList.propTypes = {
   onDelete: PropTypes.func.isRequired,
   onChangeTitle: PropTypes.func.isRequired,
   onStartDrag: PropTypes.func.isRequired,
-  onEndDrag: PropTypes.func.isRequired,
+  onEndDrag: PropTypes.func.isRequired
 }

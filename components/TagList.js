@@ -2,19 +2,17 @@ import React, { PropTypes, Component } from 'react'
 import ReactDOM from 'react-dom'
 import moment from 'moment'
 
-
-function monthDays(firstDay) {
+function monthDays (firstDay) {
   let days = []
 
-  for (let d = firstDay.clone(); d.month() == firstDay.month(); d.add(1, 'days')) {
+  for (let d = firstDay.clone(); d.month() === firstDay.month(); d.add(1, 'days')) {
     days.push(d.clone())
   }
 
   return days
 }
 
-
-function weekChunks(days) {
+function weekChunks (days) {
   let weeks = []
   const first = days[0].weekday()
   const last = days[days.length - 1].weekday()
@@ -31,29 +29,28 @@ function weekChunks(days) {
   return weeks
 }
 
-
 export default class TagList extends Component {
-  constructor(props) {
+  constructor (props) {
     super(props)
     this.onDropItem = this.onDropItem.bind(this)
     this.state = {
       addItemId: null,
-      scheduleItemId: null,
+      scheduleItemId: null
     }
   }
 
-  componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate (prevProps, prevState) {
     if (prevState.addItemId === null && this.state.addItemId !== null) {
-      ReactDOM.findDOMNode(this.refs.addtag).focus();
+      ReactDOM.findDOMNode(this.refs.addtag).focus()
     }
   }
 
-  onDropItem(e, tag) {
+  onDropItem (e, tag) {
     e.preventDefault()
     this.props.onSetTag(e.dataTransfer.getData('itemId'), tag)
   }
 
-  onDropItemTickler(e) {
+  onDropItemTickler (e) {
     e.preventDefault()
     this.setState({
       scheduleItemId: e.dataTransfer.getData('itemId'),
@@ -61,12 +58,12 @@ export default class TagList extends Component {
     })
   }
 
-  onAddItem(e) {
+  onAddItem (e) {
     e.preventDefault()
     this.setState({addItemId: e.dataTransfer.getData('itemId')})
   }
 
-  onKeyDown(e) {
+  onKeyDown (e) {
     e.stopPropagation()
 
     if (e.keyCode === 13 || e.keyCode === 27 || e.keyCode === 32) {
@@ -85,24 +82,24 @@ export default class TagList extends Component {
     return true
   }
 
-  onCancelAdd(e) {
+  onCancelAdd (e) {
     this.setState({addItemId: null})
     this.props.onCancel()
   }
 
-  onCancelSchedule(e) {
+  onCancelSchedule (e) {
     e.preventDefault()
     e.stopPropagation()
     this.setState({scheduleItemId: null})
     this.props.onCancel()
   }
 
-  onDeleteTag(e, tag) {
+  onDeleteTag (e, tag) {
     e.stopPropagation()
     this.props.onDeleteTag(tag)
   }
 
-  onChangeMonth(e, change) {
+  onChangeMonth (e, change) {
     e.preventDefault()
     e.stopPropagation()
 
@@ -111,7 +108,7 @@ export default class TagList extends Component {
     })
   }
 
-  onSchedule(e, day) {
+  onSchedule (e, day) {
     e.preventDefault()
     e.stopPropagation()
 
@@ -120,19 +117,19 @@ export default class TagList extends Component {
     this.setState({scheduleItemId: null})
   }
 
-  renderDeleteLink(tag) {
+  renderDeleteLink (tag) {
     if (tag.count === 0) {
-      return <a className="remove" onClick={e => this.onDeleteTag(e, tag.name)}>❌</a>
+      return <a className='remove' onClick={(e) => this.onDeleteTag(e, tag.name)}>❌</a>
     }
   }
 
-  renderCount(n) {
+  renderCount (n) {
     if (n > 0) {
-      return <span className="count">&ensp;{n}</span>
+      return <span className='count'>&ensp;{n}</span>
     }
   }
 
-  renderTicklerCalendar() {
+  renderTicklerCalendar () {
     const month = this.state.selectedMonth.startOf('month')
     const weeks = weekChunks(monthDays(month))
 
@@ -140,27 +137,27 @@ export default class TagList extends Component {
       <table>
         <thead>
           <tr>
-            <th colSpan="5" className="month">{month.format('MMMM YYYY')}</th>
-            <th className="clickable" onClick={e => this.onChangeMonth(e, -1)}>◂</th>
-            <th className="clickable" onClick={e => this.onChangeMonth(e, +1)}>▸</th>
+            <th colSpan='5' className='month'>{month.format('MMMM YYYY')}</th>
+            <th className='clickable' onClick={(e) => this.onChangeMonth(e, -1)}>◂</th>
+            <th className='clickable' onClick={(e) => this.onChangeMonth(e, +1)}>▸</th>
           </tr>
           <tr>
-            {moment.weekdaysMin().map(day => <th key={day}>{day}</th>)}
+            {moment.weekdaysMin().map((day) => <th key={day}>{day}</th>)}
           </tr>
         </thead>
         <tfoot>
           <tr>
             <td
-              className="clickable"
+              className='clickable'
               onClick={this.onCancelSchedule.bind(this)}
-              colSpan="7">Cancel</td>
+              colSpan='7'>Cancel</td>
           </tr>
         </tfoot>
         <tbody>
           {weeks.map((week, i) =>
             <tr key={i}>
               {week.map((day, j) =>
-                <td className="clickable" key={j} onClick={e => this.onSchedule(e, day)}>
+                <td className='clickable' key={j} onClick={(e) => this.onSchedule(e, day)}>
                   {day === null ? '' : day.date()}
                 </td>)}
             </tr>)}
@@ -169,13 +166,14 @@ export default class TagList extends Component {
     )
   }
 
-  renderTag(tag) {
+  renderTag (tag) {
     const { name, count } = tag
     return (
       <li key={name} className={name === this.props.activeTag ? 'active' : ''}
-          onClick={e => this.props.onSwitchTag(e, name)}
-          onDragOver={e => e.preventDefault()}
-          onDrop={e => name ==='tickler' ? this.onDropItemTickler(e) : this.onDropItem(e, name)} >
+        onClick={(e) => this.props.onSwitchTag(e, name)}
+        onDragOver={(e) => e.preventDefault()}
+        onDrop={(e) => name === 'tickler' ? this.onDropItemTickler(e) : this.onDropItem(e, name)}
+      >
         {name}{this.renderCount(count)}
         {this.renderDeleteLink(tag)}
         {name === 'tickler' &&
@@ -184,30 +182,31 @@ export default class TagList extends Component {
     )
   }
 
-  renderAddTagText() {
+  renderAddTagText () {
     return (
-      <li className="add"
-          onDragOver={e => e.preventDefault()}
-          onDrop={e => this.onAddItem(e)} >
+      <li className='add'
+        onDragOver={(e) => e.preventDefault()}
+        onDrop={(e) => this.onAddItem(e)} >
         Add new tag…
       </li>
     )
   }
 
-  renderAddTagInput() {
+  renderAddTagInput () {
     return (
-      <li className="add">
+      <li className='add'>
         <input
-           type="text"
-           ref="addtag"
-           placeholder="Tag name"
-           onBlur={this.onCancelAdd.bind(this)}
-           onKeyDown={this.onKeyDown.bind(this)} />
+          type='text'
+          ref='addtag'
+          placeholder='Tag name'
+          onBlur={this.onCancelAdd.bind(this)}
+          onKeyDown={this.onKeyDown.bind(this)}
+        />
       </li>
     )
   }
 
-  renderAddTag(draggingItem, showInput) {
+  renderAddTag (draggingItem, showInput) {
     if (showInput) {
       return this.renderAddTagInput()
     } else if (draggingItem) {
@@ -215,10 +214,10 @@ export default class TagList extends Component {
     }
   }
 
-  render() {
+  render () {
     return (
-      <ul id="tags">
-        {this.props.tags.map(tag => this.renderTag(tag))}
+      <ul id='tags'>
+        {this.props.tags.map((tag) => this.renderTag(tag))}
         {this.renderAddTag(this.props.draggingItem, this.state.addItemId !== null)}
       </ul>
     )
@@ -232,6 +231,6 @@ TagList.propTypes = {
   onSwitchTag: PropTypes.func.isRequired,
   onSetTag: PropTypes.func.isRequired,
   onCancel: PropTypes.func.isRequired,
-  onDeleteTag: PropTypes.func.isRequired,
+  onDeleteTag: PropTypes.func.isRequired
 }
 

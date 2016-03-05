@@ -18,6 +18,13 @@ module.exports = {
     new webpack.NoErrorsPlugin()
   ],
   module: {
+    preLoaders: [
+      {
+        test: /\.js$/,
+        loader: 'standard',
+        exclude: /node_modules/
+      }
+    ],
     loaders: [
       {
         test: /\.js$/,
@@ -25,7 +32,10 @@ module.exports = {
         exclude: /node_modules/,
         include: __dirname
       }
-    ]
+    ],
+    standard: {
+      parser: 'babel-eslint'
+    }
   }
 }
 

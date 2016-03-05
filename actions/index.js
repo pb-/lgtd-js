@@ -7,86 +7,72 @@ export const START_DRAG_ITEM = 'START_DRAG_ITEM'
 export const END_DRAG_ITEM = 'END_DRAG_ITEM'
 export const AUTHENTICATED = 'AUTHENTICATED'
 
-
-function socketRecvState(state) {
+function socketRecvState (state) {
   return {
     type: SOCKET_RECV_STATE,
-    state,
+    state
   }
 }
 
-
-function socketObj(socket) {
+function socketObj (socket) {
   return {
     type: SOCKET_OBJECT,
     socket
   }
 }
 
-
-function authenticated() {
+function authenticated () {
   return {
-    type: AUTHENTICATED,
+    type: AUTHENTICATED
   }
 }
 
-
-function authToken(token) {
+function authToken (token) {
   return {
     type: AUTH_TOKEN,
-    token,
+    token
   }
 }
 
-
-function socketRequestState(tag) {
+function socketRequestState (tag) {
   return JSON.stringify({msg: 'request_state', tag})
 }
 
-
-function socketPushCommands(commands) {
+function socketPushCommands (commands) {
   return JSON.stringify({msg: 'push_commands', cmds: commands})
 }
 
-
-function socketSendAuthResponse(token, nonce) {
+function socketSendAuthResponse (token, nonce) {
   return JSON.stringify({msg: 'auth_response', mac: md5(nonce, token)})
 }
 
-
-function cmdSetTitle(itemId, title) {
+function cmdSetTitle (itemId, title) {
   return 't ' + itemId + ' ' + title
 }
 
-
-function cmdSetTag(itemId, tag) {
+function cmdSetTag (itemId, tag) {
   return 'T ' + itemId + ' ' + tag
 }
 
-
-function cmdDeleteItem(itemId) {
+function cmdDeleteItem (itemId) {
   return 'd ' + itemId
 }
 
-
-function cmdUnsetTag(itemId) {
+function cmdUnsetTag (itemId) {
   return 'D ' + itemId
 }
 
-
-function cmdDeleteTag(tag) {
+function cmdDeleteTag (tag) {
   return 'r ' + tag
 }
 
-
-function socketReady(socket) {
+function socketReady (socket) {
   return (dispatch, getState) => {
     dispatch(socketObj(socket))
   }
 }
 
-
-function socketRecv(socket, data) {
+function socketRecv (socket, data) {
   return (dispatch, getState) => {
     switch (data.msg) {
       case 'auth_challenge':
@@ -94,10 +80,10 @@ function socketRecv(socket, data) {
       case 'state':
         return dispatch(socketRecvState(data.state))
       case 'bad_credentials':
-        localStorage.removeItem('authToken')
+        window.localStorage.removeItem('authToken')
         return socket.close()
       case 'authenticated':
-        localStorage.setItem('authToken', getState().ui.authToken)
+        window.localStorage.setItem('authToken', getState().ui.authToken)
         dispatch(authenticated())  // intentional fall through
       case 'new_state':
         return socket.send(socketRequestState(getState().ui.activeTag))
@@ -105,10 +91,9 @@ function socketRecv(socket, data) {
   }
 }
 
-
-function connectSocket() {
-  return dispatch => {
-    let socket = new WebSocket('ws://127.0.0.1:9001/gtd')
+function connectSocket () {
+  return (dispatch) => {
+    let socket = new window.WebSocket('ws://127.0.0.1:9001/gtd')
     socket.onopen = () => {
       dispatch(socketReady(socket))
     }
@@ -118,23 +103,20 @@ function connectSocket() {
   }
 }
 
-
-export function authenticate(token) {
-  return dispatch => {
+export function authenticate (token) {
+  return (dispatch) => {
     dispatch(authToken(token))
     dispatch(connectSocket())
   }
 }
 
-
-export function changeTag(tag) {
+export function changeTag (tag) {
   return (dispatch, getState) => {
     getState().socket.send(socketRequestState(tag))
   }
 }
 
-
-export function commandSetTitle(itemId, title, tag = undefined) {
+export function commandSetTitle (itemId, title, tag = undefined) {
   return (dispatch, getState) => {
     let cmds = [cmdSetTitle(itemId, title)]
 
@@ -146,43 +128,37 @@ export function commandSetTitle(itemId, title, tag = undefined) {
   }
 }
 
-
-export function commandDeleteItem(itemId) {
+export function commandDeleteItem (itemId) {
   return (dispatch, getState) => {
     getState().socket.send(socketPushCommands([cmdDeleteItem(itemId)]))
   }
 }
 
-
-export function commandSetTag(itemId, tag) {
+export function commandSetTag (itemId, tag) {
   return (dispatch, getState) => {
     getState().socket.send(socketPushCommands([cmdSetTag(itemId, tag)]))
   }
 }
 
-
-export function commandUnsetTag(itemId) {
+export function commandUnsetTag (itemId) {
   return (dispatch, getState) => {
     getState().socket.send(socketPushCommands([cmdUnsetTag(itemId)]))
   }
 }
 
-
-export function commandDeleteTag(tag) {
+export function commandDeleteTag (tag) {
   return (dispatch, getState) => {
     getState().socket.send(socketPushCommands([cmdDeleteTag(tag)]))
   }
 }
 
-
-export function startDragItem() {
+export function startDragItem () {
   return {
     type: START_DRAG_ITEM
   }
 }
 
-
-export function endDragItem() {
+export function endDragItem () {
   return {
     type: END_DRAG_ITEM
   }

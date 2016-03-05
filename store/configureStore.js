@@ -8,7 +8,7 @@ const createStoreWithMiddleware = applyMiddleware(
   createLogger()
 )(createStore)
 
-export default function configureStore(initialState) {
+export default function configureStore (initialState) {
   const store = createStoreWithMiddleware(rootReducer, initialState)
 
   if (module.hot) {
