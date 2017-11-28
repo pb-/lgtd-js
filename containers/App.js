@@ -59,11 +59,11 @@ class App extends Component {
     }
   }
 
-  handleDeleteItem (e, item_id) {
+  handleDeleteItem (e, itemId) {
     const { dispatch } = this.props
 
     e.preventDefault()
-    dispatch(commandDeleteItem(item_id))
+    dispatch(commandDeleteItem(itemId))
     this.focusAddStuff()
   }
 

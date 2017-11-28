@@ -233,4 +233,3 @@ TagList.propTypes = {
   onCancel: PropTypes.func.isRequired,
   onDeleteTag: PropTypes.func.isRequired
 }
-
