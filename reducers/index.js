@@ -1,5 +1,5 @@
 import { combineReducers } from 'redux'
-import { AUTH_TOKEN, AUTHENTICATED, SOCKET_RECV_STATE, SOCKET_OBJECT, START_DRAG_ITEM, END_DRAG_ITEM } from '../actions'
+import { AUTH_TOKEN, AUTHENTICATED, SOCKET_RECV_STATE, START_DRAG_ITEM, END_DRAG_ITEM } from '../actions'
 
 function ui (state = {
   activeTag: 'inbox',
@@ -34,14 +34,6 @@ function ui (state = {
   }
 }
 
-function socket (state = null, action) {
-  if (action.type === SOCKET_OBJECT) {
-    return action.socket
-  } else {
-    return state
-  }
-}
-
 function tags (state = [
     {name: 'inbox', count: 0}
 ], action) {
@@ -62,7 +54,6 @@ function items (state = [], action) {
 
 const rootReducer = combineReducers({
   ui,
-  socket,
   tags,
   items
 })

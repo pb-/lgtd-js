@@ -1,6 +1,5 @@
 import md5 from 'blueimp-md5'
 
-export const SOCKET_OBJECT = 'SOCKET_OBJECT'
 export const SOCKET_RECV_STATE = 'SOCKET_RECV_STATE'
 export const AUTH_TOKEN = 'AUTH_TOKEN'
 export const START_DRAG_ITEM = 'START_DRAG_ITEM'
@@ -14,20 +13,13 @@ function socketRecvState (state) {
   }
 }
 
-function socketObj (socket) {
-  return {
-    type: SOCKET_OBJECT,
-    socket
-  }
-}
-
 function authenticated () {
   return {
     type: AUTHENTICATED
   }
 }
 
-function authToken (token) {
+export function authToken (token) {
   return {
     type: AUTH_TOKEN,
     token
@@ -35,15 +27,15 @@ function authToken (token) {
 }
 
 function socketRequestState (tag) {
-  return JSON.stringify({msg: 'request_state', tag})
+  return {msg: 'request_state', tag}
 }
 
 function socketPushCommands (commands) {
-  return JSON.stringify({msg: 'push_commands', cmds: commands})
+  return {msg: 'push_commands', cmds: commands}
 }
 
 function socketSendAuthResponse (token, nonce) {
-  return JSON.stringify({msg: 'auth_response', mac: md5(nonce, token)})
+  return {msg: 'auth_response', mac: md5(nonce, token)}
 }
 
 function cmdSetTitle (itemId, title) {
@@ -66,90 +58,53 @@ function cmdDeleteTag (tag) {
   return 'r ' + tag
 }
 
-function socketReady (socket) {
-  return (dispatch, getState) => {
-    dispatch(socketObj(socket))
-  }
-}
-
-function socketRecv (socket, data) {
+export function socketRecv (socket, data) {
   return (dispatch, getState) => {
     switch (data.msg) {
       case 'auth_challenge':
-        return socket.send(socketSendAuthResponse(getState().ui.authToken, data.nonce))
+        return socket.sendJSON(socketSendAuthResponse(getState().ui.authToken, data.nonce))
       case 'state':
         return dispatch(socketRecvState(data.state))
       case 'bad_credentials':
         window.localStorage.removeItem('authToken')
-        return socket.close()
+        return dispatch(authToken(null))
       case 'authenticated':
         window.localStorage.setItem('authToken', getState().ui.authToken)
         dispatch(authenticated())  // intentional fall through
       case 'new_state':
-        return socket.send(socketRequestState(getState().ui.activeTag))
+        return socket.sendJSON(socketRequestState(getState().ui.activeTag))
     }
   }
 }
 
-function connectSocket () {
-  return (dispatch) => {
-    let socket = new window.WebSocket('ws://127.0.0.1:9001/gtd')
-    socket.onopen = () => {
-      dispatch(socketReady(socket))
-    }
-    socket.onmessage = (event) => {
-      dispatch(socketRecv(socket, JSON.parse(event.data)))
-    }
-  }
+export function changeTag (socket, tag) {
+  socket.sendJSON(socketRequestState(tag))
 }
 
-export function authenticate (token) {
-  return (dispatch) => {
-    dispatch(authToken(token))
-    dispatch(connectSocket())
+export function commandSetTitle (socket, itemId, title, tag = undefined) {
+  let cmds = [cmdSetTitle(itemId, title)]
+
+  if (tag !== undefined) {
+    cmds.push(cmdSetTag(itemId, tag))
   }
+
+  socket.sendJSON(socketPushCommands(cmds))
 }
 
-export function changeTag (tag) {
-  return (dispatch, getState) => {
-    getState().socket.send(socketRequestState(tag))
-  }
+export function commandDeleteItem (socket, itemId) {
+  socket.sendJSON(socketPushCommands([cmdDeleteItem(itemId)]))
 }
 
-export function commandSetTitle (itemId, title, tag = undefined) {
-  return (dispatch, getState) => {
-    let cmds = [cmdSetTitle(itemId, title)]
-
-    if (tag !== undefined) {
-      cmds.push(cmdSetTag(itemId, tag))
-    }
-
-    getState().socket.send(socketPushCommands(cmds))
-  }
+export function commandSetTag (socket, itemId, tag) {
+  socket.sendJSON(socketPushCommands([cmdSetTag(itemId, tag)]))
 }
 
-export function commandDeleteItem (itemId) {
-  return (dispatch, getState) => {
-    getState().socket.send(socketPushCommands([cmdDeleteItem(itemId)]))
-  }
+export function commandUnsetTag (socket, itemId) {
+  socket.sendJSON(socketPushCommands([cmdUnsetTag(itemId)]))
 }
 
-export function commandSetTag (itemId, tag) {
-  return (dispatch, getState) => {
-    getState().socket.send(socketPushCommands([cmdSetTag(itemId, tag)]))
-  }
-}
-
-export function commandUnsetTag (itemId) {
-  return (dispatch, getState) => {
-    getState().socket.send(socketPushCommands([cmdUnsetTag(itemId)]))
-  }
-}
-
-export function commandDeleteTag (tag) {
-  return (dispatch, getState) => {
-    getState().socket.send(socketPushCommands([cmdDeleteTag(tag)]))
-  }
+export function commandDeleteTag (socket, tag) {
+  socket.sendJSON(socketPushCommands([cmdDeleteTag(tag)]))
 }
 
 export function startDragItem () {

@@ -1,10 +1,12 @@
 import React, { Component, PropTypes } from 'react'
 import ReactDOM from 'react-dom'
 import { connect } from 'react-redux'
-import { authenticate, changeTag, commandSetTitle, commandDeleteTag, commandDeleteItem, commandSetTag, commandUnsetTag, startDragItem, endDragItem } from '../actions'
+
+import { authToken, socketRecv, changeTag, commandSetTitle, commandDeleteTag, commandDeleteItem, commandSetTag, commandUnsetTag, startDragItem, endDragItem } from '../actions'
 import { generateItemId } from '../util'
 import ItemList from '../components/ItemList'
 import TagList from '../components/TagList'
+import Websocket from './Websocket'
 
 class App extends Component {
   componentDidMount () {
@@ -12,7 +14,7 @@ class App extends Component {
 
     const token = window.localStorage.getItem('authToken')
     if (token !== null) {
-      dispatch(authenticate(token))
+      dispatch(authToken(token))
     }
     window.addEventListener('keydown', (e) => this.focusAddStuff())
   }
@@ -26,14 +28,12 @@ class App extends Component {
 
   handleTagSwitch (e, tag) {
     e.preventDefault()
-
-    const { dispatch } = this.props
-    dispatch(changeTag(tag))
+    changeTag(this.socket, tag)
     this.focusAddStuff()
   }
 
   handleAddStuff (e) {
-    const { dispatch, ui } = this.props
+    const { ui } = this.props
     e.stopPropagation()
 
     if (e.keyCode === 13) {
@@ -42,7 +42,7 @@ class App extends Component {
         if (ui.activeTag !== 'inbox' && ui.activeTag !== 'tickler') {
           tag = ui.activeTag
         }
-        dispatch(commandSetTitle(generateItemId(), e.target.value, tag))
+        commandSetTitle(this.socket, generateItemId(), e.target.value, tag)
         e.target.value = ''
       }
       return false
@@ -55,21 +55,19 @@ class App extends Component {
     if (e.keyCode === 13) {
       e.preventDefault()
       e.stopPropagation()
-      this.props.dispatch(authenticate(e.target.value))
+      this.props.dispatch(authToken(e.target.value))
     }
   }
 
   handleDeleteItem (e, itemId) {
-    const { dispatch } = this.props
-
     e.preventDefault()
-    dispatch(commandDeleteItem(itemId))
+    commandDeleteItem(this.socket, itemId)
     this.focusAddStuff()
   }
 
   handleChangeTitle (itemId, title) {
     if (title.length > 0) {
-      this.props.dispatch(commandSetTitle(itemId, title))
+      commandSetTitle(this.socket, itemId, title)
     }
   }
 
@@ -87,9 +85,9 @@ class App extends Component {
   handleSetTag (itemId, tag) {
     if (tag !== this.props.ui.activeTag && tag !== 'tickler') {
       if (tag === 'inbox') {
-        this.props.dispatch(commandUnsetTag(itemId))
+        commandUnsetTag(this.socket, itemId)
       } else if (tag !== null && tag.length > 0) {
-        this.props.dispatch(commandSetTag(itemId, tag))
+        commandSetTag(this.socket, itemId, tag)
       }
     }
     this.props.dispatch(endDragItem())
@@ -97,7 +95,7 @@ class App extends Component {
   }
 
   handleDeleteTag (tag) {
-    this.props.dispatch(commandDeleteTag(tag))
+    commandDeleteTag(this.socket, tag)
     this.focusAddStuff()
   }
 
@@ -106,10 +104,14 @@ class App extends Component {
     this.focusAddStuff()
   }
 
+  handleReceive (message) {
+    this.props.dispatch(socketRecv(this.socket, message))
+  }
+
   renderApp () {
     const { tags, items } = this.props
     return (
-      <div>
+      <div id='app'>
         <div id='menu'>
           <p id='thead'>lgtd-jsclient</p>
           <TagList
@@ -140,8 +142,16 @@ class App extends Component {
   }
 
   render () {
-    if (this.props.ui.authenticated) {
-      return this.renderApp()
+    if (this.props.ui.authToken) {
+      return (
+        <div>
+          <Websocket
+            url='ws://127.0.0.1:9001/gtd'
+            onJSON={this.handleReceive.bind(this)}
+            ref={s => { this.socket = s }} />
+          {this.props.ui.authenticated ? this.renderApp() : ''}
+        </div>
+      )
     } else {
       return (
         <input
